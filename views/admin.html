@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>後台管理 | KS 數位名片</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; }
+
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px; background: #1a1a2e; color: #fff; padding: 24px 0;
+      display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; z-index: 50;
+    }
+    .sidebar-brand { padding: 0 24px; font-size: 20px; font-weight: 700; margin-bottom: 32px; }
+    .sidebar-brand span { color: #06c755; }
+    .sidebar-nav { flex: 1; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 24px;
+      font-size: 14px; color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.2s;
+      text-decoration: none; border-left: 3px solid transparent;
+    }
+    .sidebar-item:hover, .sidebar-item.active {
+      background: rgba(255,255,255,0.06); color: #fff; border-left-color: #06c755;
+    }
+    .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-footer .btn-logout {
+      width: 100%; padding: 10px; background: rgba(255,255,255,0.06); border: none;
+      color: rgba(255,255,255,0.6); border-radius: 8px; cursor: pointer; font-size: 13px;
+    }
+    .sidebar-footer .btn-logout:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+    .main-content { flex: 1; margin-left: 240px; }
+    .topbar {
+      background: #fff; padding: 16px 28px; border-bottom: 1px solid #e8e8e8;
+      display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 40;
+    }
+    .topbar h1 { font-size: 18px; font-weight: 700; }
+    .btn { padding: 10px 22px; font-size: 14px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+    .btn:active { transform: scale(0.97); }
+    .btn-green { background: #06c755; color: #fff; }
+    .btn-gray { background: #e8e8e8; color: #555; }
+    .content { padding: 24px 28px; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 28px; }
+    .stat-card { background: #fff; padding: 18px; border-radius: 14px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .stat-num { font-size: 28px; font-weight: 800; color: #06c755; }
+    .stat-num.vip-color { color: #f39c12; }
+    .stat-label { font-size: 11px; color: #999; margin-top: 4px; font-weight: 500; }
+
+    /* Search */
+    .search-bar {
+      display: flex; gap: 10px; margin-bottom: 20px; align-items: center;
+    }
+    .search-input {
+      flex: 1; padding: 10px 16px; border: 1.5px solid #e0e0e0; border-radius: 10px;
+      font-size: 14px; outline: none; transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: #06c755; }
+    .filter-btn {
+      padding: 10px 18px; border-radius: 10px; border: 1.5px solid #e0e0e0;
+      background: #fff; cursor: pointer; font-size: 13px; font-weight: 600; color: #666;
+      transition: all 0.2s;
+    }
+    .filter-btn.active { border-color: #06c755; background: #e6f9ee; color: #06a04a; }
+    .filter-btn.vip-active { border-color: #f39c12; background: #fff8e1; color: #e67e22; }
+
+    /* Table */
+    .table-wrap { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { background: #fafafa; padding: 14px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid #eee; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    td { padding: 14px 16px; border-bottom: 1px solid #f5f5f5; }
+    tr:hover td { background: #fafff5; }
+    .slug-link { color: #06c755; text-decoration: none; font-weight: 500; font-size: 13px; }
+    .slug-link:hover { text-decoration: underline; }
+    .badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .badge-on { background: #e6f9ee; color: #06a04a; }
+    .badge-off { background: #fce8e8; color: #c0392b; }
+    .badge-admin { background: #e8f4fd; color: #2980b9; }
+    .badge-self { background: #fff3e0; color: #e67e22; }
+    .badge-vip { background: linear-gradient(135deg, #f39c12, #e67e22); color: #fff; }
+    .badge-free { background: #e8e8e8; color: #888; }
+    .action-btns { display: flex; gap: 6px; }
+    .btn-xs { padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: all 0.15s; }
+    .btn-xs:active { transform: scale(0.95); }
+    .btn-edit { background: #e8f4fd; color: #2980b9; }
+    .btn-del { background: #fce8e8; color: #c0392b; }
+    .btn-copy { background: #f0f0f0; color: #555; }
+    .btn-vip { background: linear-gradient(135deg, #f39c12, #e67e22); color: #fff; }
+    .btn-vip.downgrade { background: #e8e8e8; color: #888; }
+    .btn-pwd { background: #f3e8fd; color: #8e44ad; }
+    .empty { text-align: center; padding: 60px 20px; color: #ccc; }
+
+    /* User cards */
+    .user-card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .user-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .user-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .user-meta { font-size: 13px; color: #888; }
+    .user-meta span { margin-right: 16px; }
+    .user-actions { display: flex; gap: 6px; align-items: flex-start; flex-wrap: wrap; }
+    .user-cards-list { margin-top: 12px; }
+    .user-card-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: #f8f9fa; border-radius: 8px; margin-bottom: 6px; font-size: 13px;
+    }
+    .user-card-item a { color: #06c755; text-decoration: none; font-weight: 600; }
+    .user-card-item a:hover { text-decoration: underline; }
+    .card-stats-inline { color: #999; font-size: 12px; }
+
+    /* Modal */
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+    .modal-bg.active { display: flex; }
+    .modal { background: #fff; border-radius: 20px; padding: 32px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+    .modal h3 { margin-bottom: 24px; font-size: 20px; font-weight: 700; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 5px; font-weight: 600; }
+    .form-group input, .form-group select { width: 100%; padding: 11px 14px; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 14px; outline: none; }
+    .form-group input:focus { border-color: #06c755; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-divider { border: none; border-top: 1px solid #f0f0f0; margin: 18px 0; }
+    .form-section { font-size: 12px; color: #999; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+    .form-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .form-actions .btn { flex: 1; padding: 14px; font-size: 15px; }
+
+    /* Log */
+    .log-list { list-style: none; }
+    .log-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+    .log-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .log-icon.view { background: #e8f4fd; }
+    .log-icon.share { background: #e6f9ee; }
+    .log-time { color: #bbb; font-size: 11px; }
+
+    .mobile-toggle { display: none; }
+    .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 45; }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar.open ~ .mobile-overlay { display: block; }
+      .main-content { margin-left: 0; }
+      .mobile-toggle { display: block; background: none; border: none; font-size: 24px; cursor: pointer; padding: 8px; }
+      .topbar { padding: 12px 16px; }
+      .topbar h1 { font-size: 16px; }
+      .content { padding: 16px; }
+
+      /* 统计卡片 2 列 */
+      .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+      .stat-card { padding: 14px 10px; }
+      .stat-num { font-size: 22px; }
+
+      /* 顶部按钮 */
+      .topbar .btn { padding: 8px 14px; font-size: 13px; }
+
+      /* 表格改为卡片式布局 */
+      .table-wrap { background: none; box-shadow: none; overflow: visible; }
+      table, thead, tbody, th, tr { display: block; }
+      thead { display: none; }
+      tbody { min-height: 200px; }
+      tr {
+        background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: flex; flex-wrap: wrap; gap: 6px 12px;
+      }
+      tr:hover td { background: none; }
+      td { border: none; padding: 4px 0; font-size: 14px; }
+      td:nth-child(1) { width: 100%; font-size: 16px; }
+      td:nth-child(2) { width: 100%; color: #888; font-size: 13px; }
+      td:nth-child(3) { width: 100%; }
+      td:nth-child(8) { width: 100%; margin-top: 8px; }
+      .action-btns { flex-wrap: wrap; gap: 8px; }
+      .btn-xs { padding: 10px 16px; font-size: 13px; border-radius: 8px; min-height: 40px; }
+      .slug-link { font-size: 14px; }
+
+      /* 搜索栏 */
+      .search-bar { flex-wrap: wrap; }
+      .search-input { font-size: 16px; padding: 12px 16px; }
+      .filter-btn { padding: 12px 16px; font-size: 14px; }
+
+      /* 表单 */
+      .form-row { grid-template-columns: 1fr; }
+      .modal { padding: 24px 20px; border-radius: 16px; }
+      .modal h3 { font-size: 18px; }
+      .form-group input, .form-group select { font-size: 16px; padding: 12px 14px; }
+      .form-actions .btn { padding: 16px; font-size: 16px; min-height: 48px; }
+      #c_flex_json { font-size: 14px; height: 240px; }
+
+      /* 用户卡片 */
+      .user-card { padding: 18px 16px; }
+      .user-header { flex-direction: column; gap: 12px; }
+      .user-actions { width: 100%; }
+      .user-actions .btn-xs { flex: 1; text-align: center; padding: 10px 8px; font-size: 13px; min-height: 40px; }
+      .user-card-item { flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px; }
+
+      /* 侧边栏 */
+      .sidebar-item { padding: 16px 24px; font-size: 16px; }
+      .sidebar-footer .btn-logout { padding: 14px; font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">KS<span>.</span>Admin</div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-item active" data-tab="cards" onclick="switchTab('cards')">&#x1F4CB; 名片管理</a>
+        <a class="sidebar-item" data-tab="users-normal" onclick="switchTab('users-normal')">&#x1F465; 普通用戶</a>
+        <a class="sidebar-item" data-tab="users-vip" onclick="switchTab('users-vip')">&#x2B50; VIP 用戶</a>
+        <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">&#x1F4CA; 統計分析</a>
+        <a class="sidebar-item" href="/" style="margin-top:auto">&#x2190; 回前台</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn-logout" onclick="logout()">登出管理後台</button>
+      </div>
+    </aside>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+    <div class="main-content">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="mobile-toggle" onclick="toggleSidebar()">&#9776;</button>
+          <h1 id="pageTitle">名片管理</h1>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-green" id="topAddBtn" onclick="openModal()">+ 新增名片</button>
+          <button class="btn" id="topCustomBtn" style="background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff" onclick="openCustomModal()">+ 自創名片檔</button>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="stats">
+          <div class="stat-card"><div class="stat-num" id="statTotal">-</div><div class="stat-label">名片總數</div></div>
+          <div class="stat-card"><div class="stat-num" id="statActive">-</div><div class="stat-label">啟用中</div></div>
+          <div class="stat-card"><div class="stat-num" id="statViews">-</div><div class="stat-label">總瀏覽</div></div>
+          <div class="stat-card"><div class="stat-num" id="statShares">-</div><div class="stat-label">總分享</div></div>
+          <div class="stat-card"><div class="stat-num" id="statUsers">-</div><div class="stat-label">註冊用戶</div></div>
+          <div class="stat-card"><div class="stat-num vip-color" id="statVip">-</div><div class="stat-label">VIP 用戶</div></div>
+        </div>
+
+        <!-- Cards Tab -->
+        <div id="tabCards">
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th>姓名</th><th>公司 / 職稱</th><th>分享連結</th>
+                <th>瀏覽</th><th>分享</th><th>來源</th><th>狀態</th><th>操作</th>
+              </tr></thead>
+              <tbody id="cardList"></tbody>
+            </table>
+            <div class="empty" id="emptyMsg" style="display:none">尚未建立任何名片</div>
+          </div>
+        </div>
+
+        <!-- Normal Users Tab -->
+        <div id="tabUsersNormal" style="display:none">
+          <div class="search-bar">
+            <input class="search-input" id="searchNormal" placeholder="搜尋 Email 或姓名..." oninput="searchUsers('normal')">
+            <span id="normalCount" style="font-size:13px;color:#999;white-space:nowrap"></span>
+          </div>
+          <div id="normalUserList"></div>
+          <div class="empty" id="normalEmpty" style="display:none">無符合條件的用戶</div>
+        </div>
+
+        <!-- VIP Users Tab -->
+        <div id="tabUsersVip" style="display:none">
+          <div class="search-bar">
+            <input class="search-input" id="searchVip" placeholder="搜尋 Email 或姓名..." oninput="searchUsers('vip')">
+            <span id="vipCount" style="font-size:13px;color:#999;white-space:nowrap"></span>
+          </div>
+          <div id="vipUserList"></div>
+          <div class="empty" id="vipEmpty" style="display:none">尚無 VIP 用戶</div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="tabStats" style="display:none">
+          <h3 style="margin-bottom:16px;font-size:16px">近期活動紀錄</h3>
+          <div class="table-wrap" style="padding:16px">
+            <ul class="log-list" id="logList"></ul>
+            <div class="empty" id="logEmpty" style="display:none">暫無活動紀錄</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Modal -->
+  <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3 id="modalTitle">新增名片</h3>
+      <input type="hidden" id="editId">
+      <div class="form-section">基本資料</div>
+      <div class="form-group"><label>姓名 *</label><input type="text" id="f_name" required></div>
+      <div class="form-group"><label>專屬連結 (slug)</label><input type="text" id="f_slug" placeholder="留空自動產生"></div>
+      <div class="form-row">
+        <div class="form-group"><label>公司</label><input type="text" id="f_company"></div>
+        <div class="form-group"><label>職稱</label><input type="text" id="f_title"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>部門</label><input type="text" id="f_department"></div>
+        <div class="form-group"><label>主題色</label><input type="color" id="f_theme_color" value="#06c755"></div>
+      </div>
+      <hr class="form-divider">
+      <div class="form-section">聯絡方式</div>
+      <div class="form-row">
+        <div class="form-group"><label>電話</label><input type="tel" id="f_phone"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="f_email"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>LINE ID</label><input type="text" id="f_line_id"></div>
+        <div class="form-group"><label>網站</label><input type="url" id="f_website"></div>
+      </div>
+      <div class="form-group"><label>地址</label><input type="text" id="f_address"></div>
+      <hr class="form-divider">
+      <div class="form-section">社群</div>
+      <div class="form-row">
+        <div class="form-group"><label>Facebook</label><input type="url" id="f_facebook"></div>
+        <div class="form-group"><label>Instagram</label><input type="url" id="f_instagram"></div>
+      </div>
+      <div class="form-group"><label>LinkedIn</label><input type="url" id="f_linkedin"></div>
+      <hr class="form-divider">
+      <div class="form-section">圖片</div>
+      <div class="form-row">
+        <div class="form-group"><label>頭像 URL</label><input type="text" id="f_avatar_url"></div>
+        <div class="form-group"><label>Logo URL</label><input type="text" id="f_logo_url"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-gray" onclick="closeModal()">取消</button>
+        <button class="btn btn-green" onclick="saveCard()">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Flex Card Modal -->
+  <div class="modal-bg" id="customModalBg" onclick="if(event.target===this)closeCustomModal()">
+    <div class="modal" style="max-width:680px">
+      <h3 id="customModalTitle">新增自創名片檔</h3>
+      <input type="hidden" id="customEditId">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>名片名稱 *</label>
+          <input type="text" id="c_name" placeholder="例如: 刁民餐飲 - 黃偉豪">
+        </div>
+        <div class="form-group">
+          <label>專屬連結 (slug)</label>
+          <input type="text" id="c_slug" placeholder="例如: diaominasia（留空自動產生）">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>指定給用戶（可選，輸入用戶 ID）</label>
+        <input type="number" id="c_user_id" placeholder="留空 = 管理員名片">
+      </div>
+
+      <hr class="form-divider">
+
+      <div class="form-group">
+        <label>上傳圖片（上傳後複製 URL 貼入 JSON）</label>
+        <input type="file" id="c_image_file" accept="image/*" multiple>
+        <div id="uploadedImages" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:10px"></div>
+      </div>
+
+      <hr class="form-divider">
+
+      <div class="form-group">
+        <label>Flex Message JSON *</label>
+        <div style="font-size:11px;color:#999;margin-bottom:6px">貼入完整的 LINE Flex Message JSON（bubble 格式）。上傳圖片後可複製 URL 填入 JSON 中的圖片欄位。</div>
+        <textarea id="c_flex_json" style="width:100%;height:320px;padding:14px;border:1.5px solid #e0e0e0;border-radius:10px;font-family:monospace;font-size:13px;outline:none;resize:vertical;tab-size:2" placeholder='{"type":"bubble","body":{...}}'></textarea>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-gray" style="font-size:12px;padding:6px 14px" onclick="formatJson()">格式化 JSON</button>
+        <button class="btn btn-gray" style="font-size:12px;padding:6px 14px" onclick="validateJson()">驗證 JSON</button>
+        <button class="btn btn-gray" style="font-size:12px;padding:6px 14px" onclick="loadJsonFile()">從檔案匯入</button>
+        <input type="file" id="jsonFileInput" accept=".json" style="display:none" onchange="handleJsonFile(event)">
+      </div>
+      <p id="jsonStatus" style="font-size:12px;margin-bottom:10px"></p>
+
+      <div class="form-actions">
+        <button class="btn btn-gray" onclick="closeCustomModal()">取消</button>
+        <button class="btn btn-green" onclick="saveCustomCard()">儲存自創名片</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password Reset Modal -->
+  <div class="modal-bg" id="pwdModalBg" onclick="if(event.target===this)closePwdModal()">
+    <div class="modal" style="max-width:400px">
+      <h3>重設用戶密碼</h3>
+      <p style="font-size:13px;color:#888;margin-bottom:16px">用戶：<strong id="pwdUserName"></strong></p>
+      <input type="hidden" id="pwdUserId">
+      <div class="form-group">
+        <label>新密碼</label>
+        <input type="password" id="newPassword" placeholder="至少 6 個字元" minlength="6">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-gray" onclick="closePwdModal()">取消</button>
+        <button class="btn btn-green" onclick="resetPassword()">確認重設</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TOKEN = localStorage.getItem('token');
+    if (!TOKEN) window.location.href = '/admin/login';
+
+    const API = (path, opt = {}) => fetch('/api' + path, {
+      ...opt,
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN, ...opt.headers }
+    }).then(r => r.json());
+
+    const DOMAIN = location.origin;
+    const fields = ['name','slug','company','title','department','phone','email','line_id','website','address',
+                    'facebook','instagram','linkedin','avatar_url','logo_url','theme_color'];
+
+    const tabNames = { cards: '名片管理', 'users-normal': '普通用戶', 'users-vip': 'VIP 用戶', stats: '統計分析' };
+    const tabIds = { cards: 'tabCards', 'users-normal': 'tabUsersNormal', 'users-vip': 'tabUsersVip', stats: 'tabStats' };
+
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
+
+    function switchTab(tab) {
+      closeSidebar();
+      document.querySelectorAll('.sidebar-item[data-tab]').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.sidebar-item[data-tab="${tab}"]`)?.classList.add('active');
+      Object.values(tabIds).forEach(id => document.getElementById(id).style.display = 'none');
+      document.getElementById(tabIds[tab]).style.display = 'block';
+      document.getElementById('pageTitle').textContent = tabNames[tab];
+      document.getElementById('topAddBtn').style.display = tab === 'cards' ? '' : 'none';
+      if (tab === 'users-normal') loadUsers('normal');
+      if (tab === 'users-vip') loadUsers('vip');
+    }
+
+    // ===== Cards =====
+    async function loadCards() {
+      const data = await API('/cards');
+      if (data.error && data.error.includes('登入')) { window.location.href = '/admin/login'; return; }
+      const list = data.cards || [];
+      const tbody = document.getElementById('cardList');
+      const emptyMsg = document.getElementById('emptyMsg');
+      if (list.length === 0) { tbody.innerHTML = ''; emptyMsg.style.display = 'block'; return; }
+      emptyMsg.style.display = 'none';
+      const scrollY = window.scrollY;
+      tbody.innerHTML = list.map(c => `<tr>
+        <td><strong>${esc(c.name)}</strong></td>
+        <td>${esc(c.company)}${c.company && c.title ? ' / ' : ''}${esc(c.title)}</td>
+        <td><a class="slug-link" href="${DOMAIN}/share/${esc(c.slug)}" target="_blank">/share/${esc(c.slug)}</a></td>
+        <td>${c.view_count}</td><td>${c.share_count}</td>
+        <td><span class="badge ${c.owner_type === 'admin' ? 'badge-admin' : c.user_vip ? 'badge-vip' : 'badge-self'}">${c.owner_type === 'admin' ? '管理員' : c.user_vip ? 'VIP' : '用戶'}</span></td>
+        <td><span class="badge ${c.is_active ? 'badge-on' : 'badge-off'}">${c.is_active ? '啟用' : '停用'}</span></td>
+        <td><div class="action-btns">
+          <button class="btn-xs btn-copy" onclick="copyLink('${esc(c.slug)}')">複製</button>
+          <button class="btn-xs btn-edit" onclick="editCard(${c.id})">編輯</button>
+          <button class="btn-xs" style="background:#fff3e0;color:#e67e22" onclick="editFlexJson(${c.id})">JSON</button>
+          <button class="btn-xs btn-del" onclick="deleteCard(${c.id},'${esc(c.name)}')">刪除</button>
+        </div></td>
+      </tr>`).join('');
+      requestAnimationFrame(() => window.scrollTo(0, scrollY));
+    }
+
+    async function loadStats() {
+      const data = await API('/stats');
+      if (!data.ok) return;
+      document.getElementById('statTotal').textContent = data.stats.totalCards;
+      document.getElementById('statActive').textContent = data.stats.activeCards;
+      document.getElementById('statViews').textContent = data.stats.totalViews;
+      document.getElementById('statShares').textContent = data.stats.totalShares;
+      document.getElementById('statUsers').textContent = data.stats.totalUsers;
+      document.getElementById('statVip').textContent = data.stats.vipUsers;
+
+      const logList = document.getElementById('logList');
+      if (!data.recentLogs || data.recentLogs.length === 0) {
+        logList.innerHTML = ''; document.getElementById('logEmpty').style.display = 'block'; return;
+      }
+      document.getElementById('logEmpty').style.display = 'none';
+      logList.innerHTML = data.recentLogs.map(l => `<li class="log-item">
+        <div class="log-icon ${l.action}">${l.action === 'view' ? '&#x1F441;' : '&#x1F4E4;'}</div>
+        <div style="flex:1"><strong>${esc(l.name)}</strong> 被${l.action === 'view' ? '瀏覽' : '分享'}了<div class="log-time">${l.created_at}</div></div>
+      </li>`).join('');
+    }
+
+    // ===== Users =====
+    let searchTimerNormal, searchTimerVip;
+
+    function searchUsers(type) {
+      const timer = type === 'normal' ? 'searchTimerNormal' : 'searchTimerVip';
+      clearTimeout(window[timer]);
+      window[timer] = setTimeout(() => loadUsers(type), 300);
+    }
+
+    async function loadUsers(type) {
+      const isVip = type === 'vip';
+      const searchEl = document.getElementById(isVip ? 'searchVip' : 'searchNormal');
+      const q = searchEl ? searchEl.value : '';
+      const params = new URLSearchParams({ vip: isVip ? '1' : '0' });
+      if (q) params.set('q', q);
+
+      const data = await API('/users?' + params.toString());
+      if (!data.ok) return;
+      const users = data.users || [];
+
+      const listEl = document.getElementById(isVip ? 'vipUserList' : 'normalUserList');
+      const emptyEl = document.getElementById(isVip ? 'vipEmpty' : 'normalEmpty');
+      const countEl = document.getElementById(isVip ? 'vipCount' : 'normalCount');
+      countEl.textContent = `${users.length} 位`;
+
+      if (users.length === 0) { listEl.innerHTML = ''; emptyEl.style.display = 'block'; return; }
+      emptyEl.style.display = 'none';
+      const scrollY = window.scrollY;
+      listEl.innerHTML = users.map(u => `
+        <div class="user-card">
+          <div class="user-header">
+            <div class="user-info">
+              <h3>${esc(u.name)} <span class="badge ${u.is_vip ? 'badge-vip' : 'badge-free'}">${u.is_vip ? 'VIP' : '免費'}</span></h3>
+              <div class="user-meta">
+                <span>&#x2709; ${esc(u.email)}</span>
+                <span>&#x260E; ${esc(u.phone)}</span>
+              </div>
+            </div>
+            <div class="user-actions">
+              <button class="btn-xs btn-vip ${u.is_vip ? 'downgrade' : ''}" onclick="toggleVip(${u.id}, '${esc(u.name)}', ${u.is_vip})">
+                ${u.is_vip ? '取消 VIP' : '升級 VIP'}
+              </button>
+              <button class="btn-xs btn-pwd" onclick="openPwdModal(${u.id}, '${esc(u.name)} (${esc(u.email)})')">重設密碼</button>
+              <button class="btn-xs" style="background:#e74c3c;color:#fff" onclick="deleteUser(${u.id}, '${esc(u.name)}')">刪除</button>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#bbb;margin-bottom:8px">
+            註冊：${u.created_at}${u.vip_at ? ' | VIP 開通：' + u.vip_at : ''} | ${u.card_count} 張名片
+          </div>
+          ${u.cards.length > 0 ? `<div class="user-cards-list">${u.cards.map(c => `
+            <div class="user-card-item">
+              <div><strong>${esc(c.name)}</strong>${c.company ? ' - ' + esc(c.company) : ''}
+                <a href="${DOMAIN}/share/${esc(c.slug)}" target="_blank" style="margin-left:8px">/share/${esc(c.slug)}</a>
+              </div>
+              <div class="card-stats-inline">
+                <span class="badge ${c.is_active ? 'badge-on' : 'badge-off'}" style="margin-right:6px">${c.is_active ? '啟用' : '停用'}</span>
+                &#x1F441; ${c.view_count} &nbsp; &#x1F4E4; ${c.share_count}
+              </div>
+            </div>
+          `).join('')}</div>` : '<div style="font-size:13px;color:#ccc;margin-top:4px">尚未建立名片</div>'}
+        </div>
+      `).join('');
+      requestAnimationFrame(() => window.scrollTo(0, scrollY));
+    }
+
+    async function deleteUser(userId, name) {
+      if (!confirm(`確定要刪除用戶「${name}」嗎？\n\n此操作將同時刪除該用戶的所有名片，且無法復原！`)) return;
+      const data = await API('/users/' + userId, { method: 'DELETE' });
+      if (data.ok) {
+        alert(data.message);
+        loadUsers('normal');
+        loadUsers('vip');
+        loadStats();
+      } else {
+        alert(data.error || '刪除失敗');
+      }
+    }
+
+    async function toggleVip(userId, name, currentVip) {
+      const action = currentVip ? '取消' : '升級';
+      if (!confirm(`確定要${action}「${name}」的 VIP 嗎？`)) return;
+      const data = await API('/users/' + userId + '/vip', { method: 'PUT' });
+      if (data.ok) {
+        alert(data.message);
+        loadUsers('normal');
+        loadUsers('vip');
+        loadStats();
+      } else {
+        alert(data.error || '操作失敗');
+      }
+    }
+
+    // ===== Password Reset =====
+    function openPwdModal(userId, name) {
+      document.getElementById('pwdUserId').value = userId;
+      document.getElementById('pwdUserName').textContent = name;
+      document.getElementById('newPassword').value = '';
+      document.getElementById('pwdModalBg').classList.add('active');
+    }
+    function closePwdModal() { document.getElementById('pwdModalBg').classList.remove('active'); }
+
+    async function resetPassword() {
+      const userId = document.getElementById('pwdUserId').value;
+      const newPassword = document.getElementById('newPassword').value;
+      if (!newPassword || newPassword.length < 6) return alert('密碼至少 6 個字元');
+
+      const data = await API('/users/' + userId + '/password', {
+        method: 'PUT', body: JSON.stringify({ newPassword })
+      });
+      if (data.ok) {
+        alert('密碼已重設！');
+        closePwdModal();
+      } else {
+        alert(data.error || '重設失敗');
+      }
+    }
+
+    // ===== Card CRUD =====
+    function openModal(id) {
+      document.getElementById('editId').value = id || '';
+      document.getElementById('modalTitle').textContent = id ? '編輯名片' : '新增名片';
+      if (!id) fields.forEach(f => {
+        const el = document.getElementById('f_' + f);
+        if (el) el.value = f === 'theme_color' ? '#06c755' : '';
+      });
+      document.getElementById('modalBg').classList.add('active');
+    }
+    function closeModal() { document.getElementById('modalBg').classList.remove('active'); }
+
+    async function editCard(id) {
+      const data = await API('/cards/' + id);
+      if (!data.ok) return alert('讀取失敗');
+      openModal(id);
+      fields.forEach(f => {
+        const el = document.getElementById('f_' + f);
+        if (el && data.card[f] != null) el.value = data.card[f];
+      });
+    }
+
+    async function saveCard() {
+      const id = document.getElementById('editId').value;
+      const body = {};
+      fields.forEach(f => { body[f] = document.getElementById('f_' + f)?.value || ''; });
+      if (!body.name) return alert('姓名為必填');
+      const data = await API(id ? '/cards/' + id : '/cards', { method: id ? 'PUT' : 'POST', body: JSON.stringify(body) });
+      if (data.ok) { closeModal(); loadCards(); loadStats(); if (!id && data.share_url) alert('建立成功！\n' + data.share_url); }
+      else alert(data.error || '儲存失敗');
+    }
+
+    async function deleteCard(id, name) {
+      if (!confirm(`確定要刪除「${name}」的名片嗎？`)) return;
+      await API('/cards/' + id, { method: 'DELETE' });
+      loadCards(); loadStats();
+    }
+
+    function copyLink(slug) {
+      navigator.clipboard.writeText(DOMAIN + '/share/' + slug).then(() => alert('已複製！'));
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/admin/login';
+    }
+
+    function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+    // ===== Custom Flex Card =====
+    function openCustomModal(id) {
+      document.getElementById('customEditId').value = id || '';
+      document.getElementById('customModalTitle').textContent = id ? '編輯自創名片 JSON' : '新增自創名片檔';
+      if (!id) {
+        document.getElementById('c_name').value = '';
+        document.getElementById('c_slug').value = '';
+        document.getElementById('c_user_id').value = '';
+        document.getElementById('c_flex_json').value = '';
+        document.getElementById('uploadedImages').innerHTML = '';
+        document.getElementById('jsonStatus').textContent = '';
+      }
+      document.getElementById('customModalBg').classList.add('active');
+    }
+    function closeCustomModal() { document.getElementById('customModalBg').classList.remove('active'); }
+
+    // 圖片上傳
+    document.getElementById('c_image_file').addEventListener('change', async function() {
+      const files = this.files;
+      const container = document.getElementById('uploadedImages');
+
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + TOKEN },
+            body: formData
+          });
+          const data = await res.json();
+          if (data.ok) {
+            const div = document.createElement('div');
+            div.style.cssText = 'background:#f5f5f5;border-radius:8px;padding:8px;display:flex;align-items:center;gap:8px';
+            div.innerHTML = `
+              <img src="${data.url}" style="width:40px;height:40px;object-fit:cover;border-radius:4px">
+              <input type="text" value="${data.url}" readonly style="font-size:11px;border:1px solid #ddd;padding:4px 8px;border-radius:4px;width:220px;font-family:monospace">
+              <button onclick="navigator.clipboard.writeText('${data.url}').then(()=>this.textContent='已複製').catch(()=>{})" style="font-size:11px;padding:4px 10px;border:none;background:#06c755;color:#fff;border-radius:4px;cursor:pointer">複製 URL</button>
+            `;
+            container.appendChild(div);
+          } else {
+            alert('上傳失敗: ' + (data.error || ''));
+          }
+        } catch (e) {
+          alert('上傳失敗');
+        }
+      }
+      this.value = '';
+    });
+
+    function formatJson() {
+      const el = document.getElementById('c_flex_json');
+      try {
+        const obj = JSON.parse(el.value);
+        el.value = JSON.stringify(obj, null, 2);
+        document.getElementById('jsonStatus').innerHTML = '<span style="color:#06a04a">&#x2705; JSON 格式正確</span>';
+      } catch (e) {
+        document.getElementById('jsonStatus').innerHTML = '<span style="color:#e74c3c">&#x274C; ' + e.message + '</span>';
+      }
+    }
+
+    function validateJson() {
+      const el = document.getElementById('c_flex_json');
+      try {
+        const obj = JSON.parse(el.value);
+        if (!obj.type) throw new Error('缺少 type 欄位（應為 "bubble"）');
+        document.getElementById('jsonStatus').innerHTML = '<span style="color:#06a04a">&#x2705; JSON 格式正確！type: ' + obj.type + '</span>';
+      } catch (e) {
+        document.getElementById('jsonStatus').innerHTML = '<span style="color:#e74c3c">&#x274C; ' + e.message + '</span>';
+      }
+    }
+
+    function loadJsonFile() { document.getElementById('jsonFileInput').click(); }
+    function handleJsonFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.name.endsWith('.json')) { alert('請選擇 .json 檔案'); return; }
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          const obj = JSON.parse(ev.target.result);
+          document.getElementById('c_flex_json').value = JSON.stringify(obj, null, 2);
+          document.getElementById('jsonStatus').innerHTML = '<span style="color:#06a04a">&#x2705; 已匯入: ' + file.name + '</span>';
+          // 自動填名稱如果是空的
+          if (!document.getElementById('c_name').value && file.name.endsWith('.json')) {
+            document.getElementById('c_name').value = file.name.replace('.json', '');
+          }
+        } catch (err) {
+          alert('JSON 解析失敗: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    async function saveCustomCard() {
+      const id = document.getElementById('customEditId').value;
+      const name = document.getElementById('c_name').value.trim();
+      const slug = document.getElementById('c_slug').value.trim();
+      const userId = document.getElementById('c_user_id').value.trim();
+      const flexJson = document.getElementById('c_flex_json').value.trim();
+
+      if (!name) return alert('請輸入名片名稱');
+      if (!flexJson) return alert('請貼入 Flex Message JSON');
+
+      // 驗證 JSON
+      try { const obj = JSON.parse(flexJson); if (!obj.type) throw new Error('缺少 type'); }
+      catch (e) { return alert('JSON 格式錯誤: ' + e.message); }
+
+      if (id) {
+        // 更新既有名片的 flex JSON
+        const data = await API('/cards/' + id + '/flex', {
+          method: 'PUT', body: JSON.stringify({ flexJson })
+        });
+        if (data.ok) { closeCustomModal(); loadCards(); alert('Flex JSON 已更新！'); }
+        else alert(data.error || '更新失敗');
+      } else {
+        // 新增自創名片
+        const data = await API('/cards/custom', {
+          method: 'POST',
+          body: JSON.stringify({ name, slug, flexJson, userId: userId ? parseInt(userId) : null })
+        });
+        if (data.ok) {
+          closeCustomModal(); loadCards(); loadStats();
+          alert('自創名片建立成功！\n分享連結: ' + data.share_url);
+        } else {
+          alert(data.error || '建立失敗');
+        }
+      }
+    }
+
+    // 在名片列表加一個「編輯 JSON」按鈕（更新 editCard 旁邊）
+    async function editFlexJson(id) {
+      const data = await API('/cards/' + id);
+      if (!data.ok) return alert('讀取失敗');
+      document.getElementById('customEditId').value = id;
+      document.getElementById('customModalTitle').textContent = '編輯名片 Flex JSON';
+      document.getElementById('c_name').value = data.card.name;
+      document.getElementById('c_slug').value = data.card.slug;
+      document.getElementById('c_user_id').value = data.card.user_id || '';
+      document.getElementById('c_flex_json').value = data.card.flex_json ? JSON.stringify(JSON.parse(data.card.flex_json), null, 2) : '';
+      document.getElementById('uploadedImages').innerHTML = '';
+      document.getElementById('jsonStatus').textContent = '';
+      document.getElementById('customModalBg').classList.add('active');
+    }
+
+    (async () => {
+      await loadCards();
+      loadStats();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我的名片 | KS 數位名片</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; min-height: 100vh; }
+
+    .navbar {
+      background: #fff; padding: 0 24px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #e8e8e8; position: sticky; top: 0; z-index: 50;
+    }
+    .navbar-brand { font-size: 18px; font-weight: 700; color: #333; text-decoration: none; }
+    .navbar-brand span { color: #06c755; }
+    .navbar-right { display: flex; align-items: center; gap: 12px; }
+    .navbar-user { font-size: 14px; color: #666; }
+    .vip-badge-nav {
+      display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700;
+      background: linear-gradient(135deg, #f39c12, #e67e22); color: #fff;
+    }
+    .btn-sm {
+      padding: 8px 18px; font-size: 13px; border-radius: 8px; border: none;
+      cursor: pointer; font-weight: 600; transition: all 0.2s;
+    }
+    .btn-sm:active { transform: scale(0.97); }
+    .btn-green { background: #06c755; color: #fff; }
+    .btn-gray { background: #e8e8e8; color: #555; }
+
+    .main { max-width: 900px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    /* Welcome */
+    .welcome {
+      background: linear-gradient(135deg, #06c755, #04a847);
+      border-radius: 16px; padding: 28px 32px; color: #fff; margin-bottom: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .welcome-left h2 { font-size: 22px; margin-bottom: 6px; }
+    .welcome-left p { opacity: 0.85; font-size: 14px; }
+
+    /* VIP Banner */
+    .vip-banner {
+      background: linear-gradient(135deg, #2c3e50, #1a252f);
+      border: 1px solid rgba(243,156,18,0.3);
+      border-radius: 14px; padding: 22px 28px; margin-bottom: 24px;
+      display: flex; justify-content: space-between; align-items: center; color: #fff;
+    }
+    .vip-banner-left h3 { font-size: 16px; margin-bottom: 4px; }
+    .vip-banner-left h3 span { color: #f39c12; }
+    .vip-banner-left p { font-size: 13px; color: rgba(255,255,255,0.6); }
+    .btn-vip {
+      padding: 12px 28px; font-size: 14px; font-weight: 700; border: none; border-radius: 10px;
+      cursor: pointer; text-decoration: none; display: inline-block;
+      background: linear-gradient(135deg, #f39c12, #e67e22); color: #fff;
+      box-shadow: 0 4px 14px rgba(243,156,18,0.3); transition: all 0.2s;
+    }
+    .btn-vip:active { transform: scale(0.97); }
+
+    /* Card limit indicator */
+    .card-limit {
+      background: #fff; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .limit-text { font-size: 14px; color: #666; }
+    .limit-text strong { color: #333; }
+    .limit-bar { width: 120px; height: 6px; background: #e8e8e8; border-radius: 3px; overflow: hidden; }
+    .limit-fill { height: 100%; background: #06c755; border-radius: 3px; transition: width 0.3s; }
+    .limit-fill.warning { background: #e67e22; }
+    .limit-fill.full { background: #e74c3c; }
+
+    .section-title {
+      font-size: 16px; font-weight: 700; margin-bottom: 16px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .card-item {
+      background: #fff; border-radius: 14px; padding: 24px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.04); transition: box-shadow 0.2s;
+    }
+    .card-item:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .card-item-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .card-item-meta { font-size: 13px; color: #888; margin-bottom: 14px; }
+    .card-item-stats { display: flex; gap: 16px; font-size: 12px; color: #999; margin-bottom: 16px; }
+    .card-item-link {
+      display: block; background: #f5f5f5; border-radius: 8px; padding: 10px 14px;
+      font-size: 13px; color: #06c755; word-break: break-all; margin-bottom: 14px;
+      text-decoration: none; font-weight: 500;
+    }
+    .card-item-link:hover { background: #e8f9ee; }
+    .card-item-actions { display: flex; gap: 8px; }
+    .btn-action {
+      flex: 1; padding: 10px; font-size: 13px; border-radius: 8px; border: none;
+      cursor: pointer; font-weight: 600; transition: all 0.2s; text-align: center;
+    }
+    .btn-action:active { transform: scale(0.97); }
+    .btn-edit { background: #e8f4fd; color: #2980b9; }
+    .btn-copy { background: #f0f0f0; color: #555; }
+    .btn-del { background: #fce8e8; color: #c0392b; }
+
+    .empty-state {
+      text-align: center; padding: 60px 20px; background: #fff;
+      border-radius: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    }
+    .empty-state .icon { font-size: 56px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 18px; margin-bottom: 8px; }
+    .empty-state p { color: #999; font-size: 14px; margin-bottom: 24px; }
+    .btn-lg {
+      display: inline-block; padding: 14px 36px; font-size: 16px; font-weight: 600;
+      border: none; border-radius: 12px; cursor: pointer; text-decoration: none;
+    }
+    .btn-lg.btn-green { background: #06c755; color: #fff; box-shadow: 0 4px 14px rgba(6,199,85,0.3); }
+
+    /* Modal */
+    .modal-bg {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 100; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-bg.active { display: flex; }
+    .modal {
+      background: #fff; border-radius: 20px; padding: 32px; width: 100%; max-width: 540px;
+      max-height: 90vh; overflow-y: auto; color: #333;
+    }
+    .modal h3 { font-size: 20px; margin-bottom: 24px; font-weight: 700; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 5px; font-weight: 600; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #e0e0e0;
+      border-radius: 10px; font-size: 14px; outline: none; transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: #06c755; }
+    .form-group input:disabled { background: #f5f5f5; color: #bbb; cursor: not-allowed; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-divider { border: none; border-top: 1px solid #f0f0f0; margin: 20px 0; }
+    .color-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .color-opt {
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 3px solid transparent;
+      transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .color-opt:hover { transform: scale(1.15); }
+    .color-opt.active { border-color: #333; box-shadow: 0 0 0 2px #fff, 0 0 0 4px #333; }
+    .color-custom {
+      background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red) !important;
+      color: #fff; font-size: 18px; font-weight: bold;
+    }
+    .btn-reset-color {
+      padding: 2px 8px; font-size: 11px; border: 1px solid #ddd; border-radius: 6px;
+      background: #f8f8f8; color: #888; cursor: pointer; white-space: nowrap;
+    }
+    .btn-reset-color:hover { background: #eee; }
+    .form-section-title { font-size: 13px; color: #999; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .form-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .form-actions .btn-sm { flex: 1; padding: 14px; font-size: 15px; border-radius: 10px; }
+    .vip-only-label { font-size: 11px; color: #f39c12; font-weight: 600; margin-left: 6px; }
+
+    @media (max-width: 600px) {
+      .card-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .navbar { padding: 0 12px; height: auto; min-height: 56px; flex-wrap: wrap; gap: 8px; padding-top: 10px; padding-bottom: 10px; }
+      .navbar-right { gap: 8px; }
+      .btn-sm { padding: 10px 14px; font-size: 14px; min-height: 40px; }
+      .main { padding: 16px 12px 60px; }
+      .welcome { flex-direction: column; gap: 12px; padding: 22px 20px; }
+      .welcome-left h2 { font-size: 18px; }
+      .vip-banner { flex-direction: column; gap: 12px; text-align: center; }
+      .card-item { padding: 20px 18px; }
+      .card-item-actions { flex-wrap: wrap; }
+      .btn-action { padding: 12px; font-size: 14px; min-height: 44px; }
+      .modal { padding: 24px 18px; border-radius: 16px; }
+      .form-group input, .form-group select { font-size: 16px; padding: 12px 14px; }
+      .form-actions .btn-sm { padding: 16px; font-size: 16px; min-height: 48px; }
+      .color-opt { width: 36px; height: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">KS<span>.</span>數位名片</a>
+    <div class="navbar-right">
+      <span class="navbar-user" id="userNameDisplay"></span>
+      <span class="vip-badge-nav" id="vipBadgeNav" style="display:none">VIP</span>
+      <button class="btn-sm btn-green" id="createBtn" onclick="openModal()">+ 建立名片</button>
+      <button class="btn-sm btn-gray" onclick="logout()">登出</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="welcome">
+      <div class="welcome-left">
+        <h2 id="welcomeText">歡迎回來！</h2>
+        <p>在這裡管理你的數位名片，建立後即可透過 LINE 分享。</p>
+      </div>
+    </div>
+
+    <!-- VIP 升級 Banner（非 VIP 顯示）-->
+    <div class="vip-banner" id="vipBanner" style="display:none">
+      <div class="vip-banner-left">
+        <h3>升級 <span>VIP</span> 解鎖完整功能</h3>
+        <p>無限名片 / 社群連結 / 網站 / LINE 分享名片功能</p>
+      </div>
+      <a href="https://line.me/R/ti/p/@546dqrum" target="_blank" class="btn-vip">升級 VIP</a>
+    </div>
+
+    <!-- 名片數量指示器 -->
+    <div class="card-limit" id="cardLimitBar">
+      <div>
+        <div class="limit-text">名片數量：<strong><span id="cardUsed">0</span> / <span id="cardMax">3</span></strong></div>
+      </div>
+      <div class="limit-bar"><div class="limit-fill" id="limitFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="section-title">
+      <span>我的名片</span>
+    </div>
+
+    <div id="cardList"></div>
+    <div id="emptyState" class="empty-state" style="display:none">
+      <div class="icon">&#x1F4C7;</div>
+      <h3>還沒有名片</h3>
+      <p>建立你的第一張數位名片，立即開始分享！</p>
+      <button class="btn-lg btn-green" onclick="openModal()">+ 建立第一張名片</button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3 id="modalTitle">建立名片</h3>
+      <input type="hidden" id="editId">
+
+      <div class="form-section-title">基本資料</div>
+      <div class="form-group">
+        <label>姓名 *</label>
+        <input type="text" id="f_name" placeholder="你的姓名" required>
+      </div>
+      <div class="form-group">
+        <label>專屬連結名稱</label>
+        <input type="text" id="f_slug" placeholder="例如: xiaoming（留空自動產生）">
+        <div style="font-size:11px;color:#aaa;margin-top:3px">分享連結將是 card.ks-digi.com/share/你的名稱</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>公司</label><input type="text" id="f_company" placeholder="公司名稱"></div>
+        <div class="form-group"><label>職稱</label><input type="text" id="f_title" placeholder="你的職稱"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>部門</label><input type="text" id="f_department"></div>
+        <div class="form-group">
+          <label>名片主色調</label>
+          <div class="color-picker" id="colorPicker">
+            <span class="color-opt" data-color="#06c755" style="background:#06c755" title="綠色"></span>
+            <span class="color-opt" data-color="#3498db" style="background:#3498db" title="藍色"></span>
+            <span class="color-opt" data-color="#e74c3c" style="background:#e74c3c" title="紅色"></span>
+            <span class="color-opt" data-color="#9b59b6" style="background:#9b59b6" title="紫色"></span>
+            <span class="color-opt" data-color="#f39c12" style="background:#f39c12" title="橘色"></span>
+            <span class="color-opt" data-color="#1abc9c" style="background:#1abc9c" title="青色"></span>
+            <span class="color-opt" data-color="#e91e63" style="background:#e91e63" title="粉紅"></span>
+            <span class="color-opt" data-color="#2c3e50" style="background:#2c3e50" title="深藍"></span>
+            <span class="color-opt" data-color="#000000" style="background:#000000" title="黑色"></span>
+            <span class="color-opt color-custom" title="自訂顏色" onclick="document.getElementById('f_theme_color_raw').click()">+</span>
+          </div>
+          <input type="color" id="f_theme_color_raw" style="display:none" value="#06c755" onchange="selectColor(this.value)">
+          <input type="hidden" id="f_theme_color" value="#06c755">
+          <div class="hint" style="margin-top:4px;color:#aaa">此顏色會套用到整張名片（名字、按鈕等）</div>
+        </div>
+
+      <!-- VIP 個別顏色設定 -->
+      <div id="vipColorSection" style="display:none">
+        <hr class="form-divider">
+        <div class="form-section-title">進階顏色設定 <span class="vip-only-label" style="background:#06c755;color:#fff">VIP</span></div>
+        <div style="font-size:12px;color:#aaa;margin-bottom:12px">不設定則使用上方主色調</div>
+        <div class="form-row">
+          <div class="form-group"><label>背景色</label><div style="display:flex;align-items:center;gap:8px"><input type="color" id="cc_bg" value="#ffffff" style="width:40px;height:32px;border:none;cursor:pointer;border-radius:6px"><span id="cc_bg_val" style="font-size:12px;color:#aaa">#ffffff</span><button type="button" class="btn-reset-color" onclick="resetCC('bg','#ffffff')">重置</button></div></div>
+          <div class="form-group"><label>姓名顏色</label><div style="display:flex;align-items:center;gap:8px"><input type="color" id="cc_name" value="#06c755" style="width:40px;height:32px;border:none;cursor:pointer;border-radius:6px"><span id="cc_name_val" style="font-size:12px;color:#aaa">#06c755</span><button type="button" class="btn-reset-color" onclick="resetCC('name','')">用主色</button></div></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>職稱/公司顏色</label><div style="display:flex;align-items:center;gap:8px"><input type="color" id="cc_title" value="#999999" style="width:40px;height:32px;border:none;cursor:pointer;border-radius:6px"><span id="cc_title_val" style="font-size:12px;color:#aaa">#999999</span><button type="button" class="btn-reset-color" onclick="resetCC('title','#999999')">重置</button></div></div>
+          <div class="form-group"><label>聯絡資訊顏色</label><div style="display:flex;align-items:center;gap:8px"><input type="color" id="cc_contactValue" value="#666666" style="width:40px;height:32px;border:none;cursor:pointer;border-radius:6px"><span id="cc_contactValue_val" style="font-size:12px;color:#aaa">#666666</span><button type="button" class="btn-reset-color" onclick="resetCC('contactValue','#666666')">重置</button></div></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>按鈕顏色</label><div style="display:flex;align-items:center;gap:8px"><input type="color" id="cc_btn" value="#06c755" style="width:40px;height:32px;border:none;cursor:pointer;border-radius:6px"><span id="cc_btn_val" style="font-size:12px;color:#aaa">#06c755</span><button type="button" class="btn-reset-color" onclick="resetCC('btn','')">用主色</button></div></div>
+          <div class="form-group"><label>底部背景色</label><div style="display:flex;align-items:center;gap:8px"><input type="color" id="cc_footerBg" value="#ffffff" style="width:40px;height:32px;border:none;cursor:pointer;border-radius:6px"><span id="cc_footerBg_val" style="font-size:12px;color:#aaa">#ffffff</span><button type="button" class="btn-reset-color" onclick="resetCC('footerBg','')">不設定</button></div></div>
+        </div>
+      </div>
+      </div>
+
+      <hr class="form-divider">
+      <div class="form-section-title">聯絡方式</div>
+      <div class="form-row">
+        <div class="form-group"><label>電話</label><input type="tel" id="f_phone" placeholder="0912-345-678"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="f_email"></div>
+      </div>
+      <div class="form-group"><label>LINE ID</label><input type="text" id="f_line_id"></div>
+      <div class="form-group"><label>地址</label><input type="text" id="f_address"></div>
+
+      <!-- VIP 專屬欄位 -->
+      <div id="vipFieldsSection">
+        <hr class="form-divider">
+        <div class="form-section-title">VIP 專屬 <span class="vip-only-label" id="vipOnlyHint">升級 VIP 解鎖</span></div>
+        <div class="form-row">
+          <div class="form-group"><label>網站 <span class="vip-only-label vip-lock-label">VIP</span></label><input type="url" id="f_website" placeholder="https://..."></div>
+          <div class="form-group"><label>Facebook <span class="vip-only-label vip-lock-label">VIP</span></label><input type="url" id="f_facebook" placeholder="https://fb.com/..."></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Instagram <span class="vip-only-label vip-lock-label">VIP</span></label><input type="url" id="f_instagram" placeholder="https://instagram.com/..."></div>
+          <div class="form-group"><label>LinkedIn <span class="vip-only-label vip-lock-label">VIP</span></label><input type="url" id="f_linkedin"></div>
+        </div>
+      </div>
+
+      <!-- VIP 分享開關 -->
+      <div id="shareToggleSection" style="display:none">
+        <hr class="form-divider">
+        <div class="form-section-title">LINE 分享功能 <span class="vip-only-label" style="background:#06c755;color:#fff">VIP</span></div>
+        <div class="form-group" style="display:flex;align-items:center;gap:10px">
+          <label style="margin:0;white-space:nowrap">啟用「透過 LINE 分享此名片」按鈕</label>
+          <input type="checkbox" id="f_allow_share" style="width:20px;height:20px;accent-color:#06c755">
+        </div>
+        <div style="font-size:11px;color:#aaa;margin-top:2px">開啟後，訪客在名片頁面可透過 LINE 將此名片分享給好友</div>
+      </div>
+
+      <hr class="form-divider">
+      <div class="form-section-title">頭像</div>
+      <div class="form-group">
+        <label>上傳頭像</label>
+        <input type="file" id="f_avatar_file" accept="image/*" onchange="uploadAvatar()">
+        <input type="hidden" id="f_avatar_url">
+        <div id="avatarPreview" style="margin-top:8px"></div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-sm btn-gray" onclick="closeModal()">取消</button>
+        <button class="btn-sm btn-green" onclick="saveCard()">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TOKEN = localStorage.getItem('userToken');
+    if (!TOKEN) window.location.href = '/login';
+
+    const userName = localStorage.getItem('userName') || '';
+    document.getElementById('userNameDisplay').textContent = userName;
+    document.getElementById('welcomeText').textContent = `${userName}，歡迎回來！`;
+
+    const DOMAIN = location.origin;
+    const API = (path, opt = {}) => fetch('/api' + path, {
+      ...opt,
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN, ...opt.headers }
+    }).then(r => r.json());
+
+    const fields = ['name','slug','company','title','department','phone','email','line_id','address',
+                    'website','facebook','instagram','linkedin','avatar_url','theme_color'];
+    const vipFields = ['website','facebook','instagram','linkedin'];
+
+    let isVip = false;
+    let cardLimit = 3;
+    let currentCardCount = 0;
+
+    async function loadUserInfo() {
+      const data = await API('/user/me');
+      if (!data.ok) {
+        localStorage.removeItem('userToken');
+        window.location.href = '/login';
+        return;
+      }
+      isVip = !!data.user.is_vip;
+      cardLimit = data.user.card_limit;
+      currentCardCount = data.user.card_count;
+
+      localStorage.setItem('isVip', isVip ? '1' : '0');
+
+      // VIP UI
+      if (isVip) {
+        document.getElementById('vipBadgeNav').style.display = 'inline-block';
+        document.getElementById('vipBanner').style.display = 'none';
+        document.getElementById('cardLimitBar').style.display = 'none';
+        document.getElementById('vipOnlyHint').style.display = 'none';
+        document.querySelectorAll('.vip-lock-label').forEach(el => el.style.display = 'none');
+      } else {
+        document.getElementById('vipBanner').style.display = 'flex';
+        updateLimitBar();
+      }
+      updateVipFields();
+    }
+
+    function updateLimitBar() {
+      document.getElementById('cardUsed').textContent = currentCardCount;
+      document.getElementById('cardMax').textContent = cardLimit;
+      const pct = Math.min((currentCardCount / cardLimit) * 100, 100);
+      const fill = document.getElementById('limitFill');
+      fill.style.width = pct + '%';
+      fill.className = 'limit-fill' + (pct >= 100 ? ' full' : pct >= 66 ? ' warning' : '');
+
+      // 隱藏建立按鈕如果已滿
+      document.getElementById('createBtn').style.display = currentCardCount >= cardLimit ? 'none' : '';
+    }
+
+    // 顏色選擇器
+    function selectColor(color) {
+      document.getElementById('f_theme_color').value = color;
+      document.getElementById('f_theme_color_raw').value = color;
+      document.querySelectorAll('.color-opt').forEach(el => {
+        el.classList.toggle('active', el.dataset.color === color);
+      });
+    }
+    document.querySelectorAll('.color-opt[data-color]').forEach(el => {
+      el.addEventListener('click', () => selectColor(el.dataset.color));
+    });
+
+    // VIP 個別顏色設定
+    const ccFields = ['bg','name','title','contactValue','btn','footerBg'];
+    ccFields.forEach(f => {
+      const el = document.getElementById('cc_' + f);
+      if (el) el.addEventListener('input', () => {
+        document.getElementById('cc_' + f + '_val').textContent = el.value;
+      });
+    });
+
+    function resetCC(field, defaultVal) {
+      const el = document.getElementById('cc_' + field);
+      if (el) {
+        el.value = defaultVal || document.getElementById('f_theme_color').value;
+        document.getElementById('cc_' + field + '_val').textContent = defaultVal || '(主色)';
+      }
+    }
+
+    function getColorConfig() {
+      if (!isVip) return '';
+      const cc = {};
+      ccFields.forEach(f => {
+        const el = document.getElementById('cc_' + f);
+        if (el && el.value) cc[f] = el.value;
+      });
+      return JSON.stringify(cc);
+    }
+
+    function setColorConfig(configStr) {
+      let cc = {};
+      try { cc = configStr ? JSON.parse(configStr) : {}; } catch(e) { cc = {}; }
+      const defaults = { bg:'#ffffff', name:'', title:'#999999', contactValue:'#666666', btn:'', footerBg:'#ffffff' };
+      ccFields.forEach(f => {
+        const el = document.getElementById('cc_' + f);
+        if (el) {
+          const val = cc[f] || defaults[f] || document.getElementById('f_theme_color').value;
+          el.value = val;
+          document.getElementById('cc_' + f + '_val').textContent = cc[f] || (defaults[f] || '(主色)');
+        }
+      });
+    }
+
+    function updateVipFields() {
+      vipFields.forEach(f => {
+        const el = document.getElementById('f_' + f);
+        if (el) {
+          el.disabled = !isVip;
+          if (!isVip) el.placeholder = 'VIP 專屬功能';
+        }
+      });
+      document.getElementById('shareToggleSection').style.display = isVip ? '' : 'none';
+      document.getElementById('vipColorSection').style.display = isVip ? '' : 'none';
+    }
+
+    async function loadCards() {
+      const data = await API('/user/cards');
+      if (data.error) {
+        localStorage.removeItem('userToken');
+        window.location.href = '/login';
+        return;
+      }
+
+      isVip = !!data.is_vip;
+      const list = data.cards || [];
+      currentCardCount = list.length;
+      const cardList = document.getElementById('cardList');
+      const emptyState = document.getElementById('emptyState');
+
+      if (!isVip) updateLimitBar();
+
+      if (list.length === 0) {
+        cardList.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      cardList.innerHTML = '<div class="card-grid">' + list.map(c => `
+        <div class="card-item">
+          <div class="card-item-name">${esc(c.name)}</div>
+          <div class="card-item-meta">${esc(c.company)}${c.company && c.title ? ' / ' : ''}${esc(c.title)}</div>
+          <div class="card-item-stats">
+            <span>&#x1F441; ${c.view_count} 次瀏覽</span>
+            <span>&#x1F4E4; ${c.share_count} 次分享</span>
+          </div>
+          <a class="card-item-link" href="${DOMAIN}/share/${esc(c.slug)}" target="_blank">
+            /share/${esc(c.slug)}
+          </a>
+          <div class="card-item-actions">
+            <button class="btn-action btn-copy" onclick="copyLink('${esc(c.slug)}')">複製連結</button>
+            <button class="btn-action btn-edit" onclick="editCard(${c.id})">編輯</button>
+            <button class="btn-action btn-del" onclick="deleteCard(${c.id},'${esc(c.name)}')">刪除</button>
+          </div>
+        </div>
+      `).join('') + '</div>';
+    }
+
+    function openModal(id) {
+      if (!id && !isVip && currentCardCount >= cardLimit) {
+        alert(`免費用戶最多建立 ${cardLimit} 張名片，請升級 VIP！`);
+        return;
+      }
+      document.getElementById('editId').value = id || '';
+      document.getElementById('modalTitle').textContent = id ? '編輯名片' : '建立名片';
+      document.getElementById('avatarPreview').innerHTML = '';
+      if (!id) {
+        fields.forEach(f => {
+          const el = document.getElementById('f_' + f);
+          if (el) el.value = f === 'theme_color' ? '#06c755' : '';
+        });
+        document.getElementById('f_allow_share').checked = false;
+        selectColor('#06c755');
+        setColorConfig('');
+      }
+      updateVipFields();
+      document.getElementById('modalBg').classList.add('active');
+    }
+
+    function closeModal() { document.getElementById('modalBg').classList.remove('active'); }
+
+    async function editCard(id) {
+      const data = await API('/user/cards/' + id);
+      if (!data.ok) return alert(data.error || '讀取失敗');
+      const c = data.card;
+      openModal(id);
+      fields.forEach(f => {
+        const el = document.getElementById('f_' + f);
+        if (el && c[f] != null) el.value = c[f];
+      });
+      document.getElementById('f_allow_share').checked = !!c.allow_share;
+      selectColor(c.theme_color || '#06c755');
+      setColorConfig(c.color_config);
+      if (c.avatar_url) {
+        document.getElementById('avatarPreview').innerHTML =
+          `<img src="${esc(c.avatar_url)}" style="width:60px;height:60px;border-radius:50%;object-fit:cover">`;
+      }
+    }
+
+    async function saveCard() {
+      const id = document.getElementById('editId').value;
+      const body = {};
+      fields.forEach(f => { body[f] = document.getElementById('f_' + f)?.value || ''; });
+      body.allow_share = document.getElementById('f_allow_share').checked ? 1 : 0;
+      body.color_config = getColorConfig();
+      if (!body.name) return alert('姓名為必填');
+
+      const url = id ? '/user/cards/' + id : '/user/cards';
+      const method = id ? 'PUT' : 'POST';
+      const data = await API(url, { method, body: JSON.stringify(body) });
+
+      if (data.ok) {
+        closeModal();
+        loadCards();
+        loadUserInfo();
+        if (id) {
+          alert('儲存成功！');
+        } else if (data.share_url) {
+          alert('名片建立成功！\n分享連結: ' + data.share_url);
+        }
+      } else {
+        alert(data.error || '儲存失敗');
+      }
+    }
+
+    async function deleteCard(id, name) {
+      if (!confirm(`確定要刪除「${name}」的名片嗎？`)) return;
+      await API('/user/cards/' + id, { method: 'DELETE' });
+      loadCards();
+      loadUserInfo();
+    }
+
+    async function uploadAvatar() {
+      const fileInput = document.getElementById('f_avatar_file');
+      if (!fileInput.files[0]) return;
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      try {
+        const res = await fetch('/api/user/upload', {
+          method: 'POST', headers: { 'Authorization': 'Bearer ' + TOKEN }, body: formData
+        });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('f_avatar_url').value = data.url;
+          document.getElementById('avatarPreview').innerHTML =
+            `<img src="${data.url}" style="width:60px;height:60px;border-radius:50%;object-fit:cover">`;
+        } else { alert(data.error || '上傳失敗'); }
+      } catch (e) { alert('上傳失敗'); }
+    }
+
+    function copyLink(slug) {
+      navigator.clipboard.writeText(DOMAIN + '/share/' + slug).then(() => alert('已複製！'));
+    }
+
+    function logout() {
+      localStorage.removeItem('userToken');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('isVip');
+      window.location.href = '/';
+    }
+
+    function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+    loadUserInfo();
+    loadCards();
+  </script>
+</body>
+</html>

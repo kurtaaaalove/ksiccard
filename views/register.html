@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>註冊帳號 | KS 數位名片</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .container { max-width: 440px; width: 100%; }
+    .logo { text-align: center; margin-bottom: 28px; }
+    .logo h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+    .logo p { color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 6px; }
+
+    .card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; padding: 36px 32px;
+    }
+    .card h2 { font-size: 20px; margin-bottom: 24px; text-align: center; font-weight: 600; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: 13px; color: rgba(255,255,255,0.7);
+      margin-bottom: 6px; font-weight: 500;
+    }
+    .form-group label .req { color: #ff6b6b; }
+    .form-group input {
+      width: 100%; padding: 13px 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 12px; color: #fff; font-size: 15px; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .form-group input::placeholder { color: rgba(255,255,255,0.3); }
+    .form-group input:focus {
+      border-color: #06c755;
+      background: rgba(255,255,255,0.1);
+    }
+    .form-group .hint { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .btn {
+      display: block; width: 100%; padding: 15px; font-size: 16px; font-weight: 600;
+      border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s;
+      margin-top: 24px; letter-spacing: 0.5px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary {
+      background: linear-gradient(135deg, #06c755, #04a847);
+      color: #fff; box-shadow: 0 4px 20px rgba(6,199,85,0.3);
+    }
+
+    .msg { font-size: 13px; text-align: center; margin-top: 14px; display: none; }
+    .msg.error { color: #ff6b6b; }
+
+    .login-link {
+      display: block; text-align: center; margin-top: 24px;
+      color: rgba(255,255,255,0.5); font-size: 14px; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .login-link:hover { color: #06c755; }
+    .login-link span { color: #06c755; font-weight: 600; }
+
+    .back-link {
+      display: block; text-align: center; margin-top: 16px;
+      color: rgba(255,255,255,0.35); font-size: 13px; text-decoration: none;
+    }
+
+    @media (max-width: 500px) {
+      .form-row { grid-template-columns: 1fr; }
+      .card { padding: 28px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>KS 數位名片</h1>
+      <p>建立你的專屬數位名片，透過 LINE 一鍵分享</p>
+    </div>
+
+    <div class="card">
+      <h2>建立帳號</h2>
+      <form id="registerForm">
+        <div class="form-group">
+          <label>Email <span class="req">*</span></label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input type="email" id="r_email" required placeholder="your@email.com" autocomplete="email" style="flex:1">
+            <button type="button" id="sendCodeBtn" onclick="sendEmailCode()" style="
+              padding:13px 16px; border:none; border-radius:12px; cursor:pointer;
+              background:linear-gradient(135deg,#06c755,#04a847); color:#fff;
+              font-size:13px; font-weight:600; white-space:nowrap; min-width:100px;
+              transition:all 0.2s;
+            ">發送驗證碼</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email 驗證碼 <span class="req">*</span></label>
+          <input type="text" id="r_email_code" required placeholder="請輸入信箱收到的 6 位數驗證碼" maxlength="6" autocomplete="off">
+          <div class="hint" style="margin-top:4px;color:rgba(255,255,255,0.35)">驗證碼 5 分鐘內有效</div>
+        </div>
+        <div class="form-group">
+          <label>密碼 <span class="req">*</span></label>
+          <input type="password" id="r_password" required placeholder="至少 6 個字元" minlength="6" autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label>確認密碼 <span class="req">*</span></label>
+          <input type="password" id="r_password2" required placeholder="再輸入一次密碼" autocomplete="new-password">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>姓名 <span class="req">*</span></label>
+            <input type="text" id="r_name" required placeholder="你的姓名">
+          </div>
+          <div class="form-group">
+            <label>電話 <span class="req">*</span></label>
+            <input type="tel" id="r_phone" required placeholder="0912-345-678">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>驗證碼 <span class="req">*</span></label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input type="text" id="r_captcha" required placeholder="請輸入圖片中的文字" style="flex:1" autocomplete="off">
+            <img id="captchaImg" style="height:45px;border-radius:8px;cursor:pointer" onclick="loadCaptcha()" title="點擊換一張">
+          </div>
+          <div class="hint" style="margin-top:4px;color:rgba(255,255,255,0.35)">看不清楚？點擊圖片換一張</div>
+          <input type="hidden" id="captchaId">
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submitBtn">建立帳號</button>
+        <p class="msg error" id="errorMsg"></p>
+      </form>
+
+      <a href="/login" class="login-link">已有帳號？<span>立即登入</span></a>
+    </div>
+
+    <a href="/" class="back-link">← 回首頁</a>
+  </div>
+
+  <script>
+    async function loadCaptcha() {
+      const res = await fetch('/api/captcha');
+      const data = await res.json();
+      document.getElementById('captchaId').value = data.id;
+      document.getElementById('captchaImg').src = data.image;
+    }
+    loadCaptcha();
+
+    // 發送 Email 驗證碼
+    let cooldown = 0;
+    async function sendEmailCode() {
+      const email = document.getElementById('r_email').value.trim();
+      const errEl = document.getElementById('errorMsg');
+      const btn = document.getElementById('sendCodeBtn');
+
+      if (!email) {
+        errEl.textContent = '請先輸入 Email';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (cooldown > 0) return;
+
+      btn.disabled = true;
+      btn.textContent = '發送中...';
+      errEl.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/send-email-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          // 倒數 60 秒
+          cooldown = 60;
+          const timer = setInterval(() => {
+            cooldown--;
+            btn.textContent = cooldown + 's';
+            if (cooldown <= 0) {
+              clearInterval(timer);
+              btn.textContent = '重新發送';
+              btn.disabled = false;
+            }
+          }, 1000);
+        } else {
+          errEl.textContent = data.error;
+          errEl.style.display = 'block';
+          btn.textContent = '發送驗證碼';
+          btn.disabled = false;
+        }
+      } catch (e) {
+        errEl.textContent = '發送失敗，請稍後再試';
+        errEl.style.display = 'block';
+        btn.textContent = '發送驗證碼';
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const errEl = document.getElementById('errorMsg');
+      errEl.style.display = 'none';
+      btn.disabled = true;
+
+      const password = document.getElementById('r_password').value;
+      const password2 = document.getElementById('r_password2').value;
+
+      if (password !== password2) {
+        errEl.textContent = '兩次密碼輸入不一致';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        return;
+      }
+
+      const emailCode = document.getElementById('r_email_code').value.trim();
+      if (!emailCode) {
+        errEl.textContent = '請輸入 Email 驗證碼';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/user/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('r_email').value,
+            password,
+            name: document.getElementById('r_name').value,
+            phone: document.getElementById('r_phone').value,
+            captchaId: document.getElementById('captchaId').value,
+            captchaCode: document.getElementById('r_captcha').value,
+            emailCode
+          })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          localStorage.setItem('userToken', data.token);
+          localStorage.setItem('userName', data.user.name);
+          window.location.href = '/dashboard';
+        } else {
+          errEl.textContent = data.error;
+          errEl.style.display = 'block';
+          loadCaptcha();
+        }
+      } catch (err) {
+        errEl.textContent = '連線失敗，請稍後再試';
+        errEl.style.display = 'block';
+        loadCaptcha();
+      }
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>

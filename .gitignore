@@ -1,0 +1,12 @@
+node_modules/
+.env
+database/cards.db
+database/cards.db-shm
+database/cards.db-wal
+uploads/*.jpg
+uploads/*.jpeg
+uploads/*.png
+uploads/*.gif
+uploads/*.webp
+*.snapshot-*
+back/

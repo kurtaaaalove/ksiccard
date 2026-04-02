@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>管理員登入 | KS 數位名片</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a; color: #fff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .container { max-width: 400px; width: 100%; }
+    .brand { text-align: center; margin-bottom: 28px; }
+    .brand h1 { font-size: 22px; font-weight: 700; }
+    .brand h1 span { color: #06c755; }
+    .brand p { color: rgba(255,255,255,0.4); font-size: 13px; margin-top: 6px; }
+
+    .card {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px; padding: 36px 32px;
+    }
+    .card h2 { font-size: 18px; margin-bottom: 28px; text-align: center; font-weight: 600; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
+    .form-group input {
+      width: 100%; padding: 13px 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 12px; color: #fff; font-size: 15px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input::placeholder { color: rgba(255,255,255,0.25); }
+    .form-group input:focus { border-color: #06c755; }
+
+    .btn {
+      display: block; width: 100%; padding: 14px; margin-top: 24px;
+      background: linear-gradient(135deg, #06c755, #04a847);
+      color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(6,199,85,0.25);
+    }
+    .btn:hover { box-shadow: 0 6px 28px rgba(6,199,85,0.35); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .error { color: #ff6b6b; font-size: 13px; margin-top: 14px; text-align: center; display: none; }
+
+    .back {
+      display: block; text-align: center; margin-top: 20px;
+      color: rgba(255,255,255,0.3); font-size: 13px; text-decoration: none;
+    }
+    .back:hover { color: rgba(255,255,255,0.6); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="brand">
+      <h1>KS<span>.</span>Admin</h1>
+      <p>管理後台登入</p>
+    </div>
+
+    <div class="card">
+      <form id="loginForm">
+        <div class="form-group">
+          <label>帳號</label>
+          <input type="text" id="username" required autocomplete="username" placeholder="admin">
+        </div>
+        <div class="form-group">
+          <label>密碼</label>
+          <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn" id="submitBtn">登入</button>
+        <p class="error" id="errorMsg"></p>
+      </form>
+    </div>
+
+    <a href="/" class="back">← 回首頁</a>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const errEl = document.getElementById('errorMsg');
+      btn.disabled = true;
+      errEl.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+          })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          localStorage.setItem('token', data.token);
+          window.location.href = '/admin';
+        } else {
+          errEl.textContent = data.error;
+          errEl.style.display = 'block';
+        }
+      } catch (err) {
+        errEl.textContent = '連線失敗，請確認伺服器狀態';
+        errEl.style.display = 'block';
+      }
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>分享名片 | KS-DIGI</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .brand { text-align: center; margin-bottom: 24px; }
+    .brand-logo { width: 150px; height: 150px; margin: 0 auto 12px; }
+    .brand-logo img { width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(1); }
+    .brand-name { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+    .brand-name span { color: #06c755; }
+    .brand-sub { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+    .container { max-width: 400px; width: 100%; }
+    .card {
+      background: rgba(255,255,255,0.95); color: #333;
+      border-radius: 20px; padding: 36px 28px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+    .avatar {
+      width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 16px;
+      background: #e8e8e8; display: flex; align-items: center; justify-content: center;
+      font-size: 36px; overflow: hidden;
+      border: 3px solid #06c755; box-shadow: 0 4px 16px rgba(6,199,85,0.2);
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    h1 { font-size: 24px; margin-bottom: 4px; color: #1a1a1a; font-weight: 700; }
+    .meta { color: #888; font-size: 14px; margin-bottom: 24px; }
+    .btn {
+      display: block; width: 100%; padding: 15px; font-size: 15px; font-weight: 600;
+      border: none; border-radius: 12px; cursor: pointer; margin-bottom: 10px;
+      transition: all 0.2s; letter-spacing: 0.3px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-line {
+      background: linear-gradient(135deg, #06c755, #04a847);
+      color: #fff; box-shadow: 0 4px 16px rgba(6,199,85,0.3);
+    }
+    .btn-copy { background: #f0f0f0; color: #555; }
+    .btn-copy:hover { background: #e5e5e5; }
+    .status { margin-top: 16px; font-size: 13px; color: #888; }
+    .error { color: #e74c3c; }
+    .footer { margin-top: 24px; text-align: center; }
+    .footer a { color: rgba(255,255,255,0.35); font-size: 12px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="brand">
+    <div class="brand-logo"><img src="https://ks-digi.com/image/KS.png" alt="KS-DIGI"></div>
+    <div class="brand-name"><span>KS-DIGI</span> 電子名片</div>
+    <div class="brand-sub">專業數位名片，LINE 一鍵分享</div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="avatar" id="avatarArea">&#x1F4C7;</div>
+      <h1 id="cardName">載入中...</h1>
+      <p class="meta" id="cardMeta"></p>
+
+      <button class="btn btn-line" id="shareBtn" style="display:none" onclick="shareFlex()">
+        透過 LINE 分享此名片
+      </button>
+      <button class="btn btn-copy" id="copyBtn" style="display:none" onclick="copyLink()">
+        複製分享連結
+      </button>
+
+      <p class="status" id="statusMsg"></p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="/">Powered by KS-DIGI</a>
+  </div>
+
+  <script>
+    let slug = location.pathname.split('/share/')[1];
+    if (!slug) {
+      const params = new URLSearchParams(location.search);
+      const state = params.get('liff.state');
+      if (state) slug = state.split('/share/')[1];
+    }
+    if (slug) slug = slug.split('?')[0].split('#')[0];
+    let cardData = null;
+    const LIFF_ID = '2007344981-yXozKWX0';
+    const LIFF_URL = 'https://liff.line.me/' + LIFF_ID;
+
+    async function loadCard() {
+      if (!slug) { showError('無效的名片連結'); return; }
+      try {
+        const res = await fetch('/api/public/card/' + slug);
+        const data = await res.json();
+        if (!data.ok) { showError('名片不存在或已停用'); return; }
+        cardData = data;
+        document.getElementById('cardName').textContent = data.name;
+        if (data.meta) document.getElementById('cardMeta').textContent = data.meta;
+        document.getElementById('copyBtn').style.display = 'block';
+      } catch (e) {
+        showError('載入失敗，請稍後再試');
+      }
+    }
+
+    async function shareFlex() {
+      if (!cardData) return;
+      const btn = document.getElementById('shareBtn');
+      btn.disabled = true;
+      btn.textContent = '分享中...';
+      try {
+        await liff.shareTargetPicker([{
+          type: 'flex',
+          altText: cardData.altText || cardData.name + ' 的名片',
+          contents: cardData.flex
+        }]);
+        fetch('/api/public/card/' + slug + '/shared', { method: 'POST' }).catch(() => {});
+        btn.textContent = '已分享！';
+      } catch (e) {
+        if (!e.message || !e.message.includes('cancel')) {
+          document.getElementById('statusMsg').textContent = '分享失敗: ' + e.message;
+        }
+      }
+      setTimeout(() => { btn.textContent = '透過 LINE 分享此名片'; btn.disabled = false; }, 2000);
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '已複製！';
+        setTimeout(() => { btn.textContent = '複製分享連結'; }, 2000);
+      });
+    }
+
+    function showError(msg) {
+      document.getElementById('cardName').textContent = '';
+      document.getElementById('statusMsg').textContent = msg;
+      document.getElementById('statusMsg').classList.add('error');
+    }
+
+    function isMobile() {
+      return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    async function initializeLiff() {
+      await loadCard();
+      try {
+        await liff.init({ liffId: LIFF_ID });
+
+        // liff.state 存在時，LIFF SDK 處理跳轉中，阻塞等待
+        const params = new URLSearchParams(location.search);
+        if (params.get('liff.state')) {
+          await new Promise(() => {});
+        }
+
+        if (liff.isInClient()) {
+          // LINE 內：直接顯示分享按鈕
+          if (!liff.isLoggedIn()) {
+            liff.login({ redirectUri: location.href });
+            await new Promise(() => {});
+          }
+          document.getElementById('shareBtn').style.display = 'block';
+          if (liff.isApiAvailable('shareTargetPicker')) {
+            shareFlex();
+          }
+        } else if (isMobile()) {
+          // 手機外部瀏覽器：按鈕跳轉到 LIFF URL，用 LINE APP 開啟
+          const btn = document.getElementById('shareBtn');
+          btn.style.display = 'block';
+          btn.onclick = function() {
+            window.location.href = LIFF_URL + '/share/' + slug;
+          };
+        } else {
+          // 電腦瀏覽器：登入後直接用 shareTargetPicker
+          if (!liff.isLoggedIn()) {
+            liff.login({ redirectUri: location.href });
+            await new Promise(() => {});
+          }
+          document.getElementById('shareBtn').style.display = 'block';
+        }
+      } catch (err) {
+        // LIFF 初始化失敗：顯示複製連結按鈕
+        document.getElementById('copyBtn').style.display = 'block';
+        document.getElementById('statusMsg').textContent = '無法載入分享功能: ' + err.message;
+      }
+    }
+
+    initializeLiff();
+  </script>
+</body>
+</html>

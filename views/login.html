@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
+  <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登入 | KS 數位名片</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .container { max-width: 440px; width: 100%; }
+    .logo { text-align: center; margin-bottom: 28px; }
+    .logo h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+    .logo p { color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 6px; }
+
+    .card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px; padding: 36px 32px;
+    }
+    .card h2 { font-size: 20px; margin-bottom: 24px; text-align: center; font-weight: 600; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: 13px; color: rgba(255,255,255,0.7);
+      margin-bottom: 6px; font-weight: 500;
+    }
+    .form-group input {
+      width: 100%; padding: 13px 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 12px; color: #fff; font-size: 15px; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .form-group input::placeholder { color: rgba(255,255,255,0.3); }
+    .form-group input:focus {
+      border-color: #06c755;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .btn {
+      display: block; width: 100%; padding: 15px; font-size: 16px; font-weight: 600;
+      border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s;
+      margin-top: 24px; letter-spacing: 0.5px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary {
+      background: linear-gradient(135deg, #06c755, #04a847);
+      color: #fff; box-shadow: 0 4px 20px rgba(6,199,85,0.3);
+    }
+
+    .msg { font-size: 13px; text-align: center; margin-top: 14px; display: none; }
+    .msg.error { color: #ff6b6b; }
+
+    .register-link {
+      display: block; text-align: center; margin-top: 24px;
+      color: rgba(255,255,255,0.5); font-size: 14px; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .register-link:hover { color: #06c755; }
+    .register-link span { color: #06c755; font-weight: 600; }
+
+    .back-link {
+      display: block; text-align: center; margin-top: 16px;
+      color: rgba(255,255,255,0.35); font-size: 13px; text-decoration: none;
+    }
+
+    @media (max-width: 500px) {
+      .card { padding: 28px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>KS 數位名片</h1>
+      <p>登入帳號，管理你的名片</p>
+    </div>
+
+    <div class="card">
+      <h2>帳號登入</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="l_email" required placeholder="your@email.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label>密碼</label>
+          <input type="password" id="l_password" required placeholder="你的密碼" autocomplete="current-password">
+        </div>
+
+        <div class="form-group">
+          <label>驗證碼</label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input type="text" id="l_captcha" required placeholder="請輸入圖片中的文字" style="flex:1" autocomplete="off">
+            <img id="captchaImg" style="height:45px;border-radius:8px;cursor:pointer" onclick="loadCaptcha()" title="點擊換一張">
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px">看不清楚？點擊圖片換一張</div>
+          <input type="hidden" id="captchaId">
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submitBtn">登入</button>
+        <p class="msg error" id="errorMsg"></p>
+      </form>
+
+      <a href="/register" class="register-link">還沒有帳號？<span>立即註冊</span></a>
+    </div>
+
+    <a href="/" class="back-link">← 回首頁</a>
+  </div>
+
+  <script>
+    // 如果已登入就跳轉
+    if (localStorage.getItem('userToken')) {
+      window.location.href = '/dashboard';
+    }
+
+    async function loadCaptcha() {
+      const res = await fetch('/api/captcha');
+      const data = await res.json();
+      document.getElementById('captchaId').value = data.id;
+      document.getElementById('captchaImg').src = data.image;
+    }
+    loadCaptcha();
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const errEl = document.getElementById('errorMsg');
+      errEl.style.display = 'none';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/user/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('l_email').value,
+            password: document.getElementById('l_password').value,
+            captchaId: document.getElementById('captchaId').value,
+            captchaCode: document.getElementById('l_captcha').value
+          })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          localStorage.setItem('userToken', data.token);
+          localStorage.setItem('userName', data.user.name);
+          localStorage.setItem('isVip', data.user.is_vip ? '1' : '0');
+          window.location.href = '/dashboard';
+        } else {
+          errEl.textContent = data.error;
+          errEl.style.display = 'block';
+          loadCaptcha();
+        }
+      } catch (err) {
+        errEl.textContent = '連線失敗，請稍後再試';
+        errEl.style.display = 'block';
+        loadCaptcha();
+      }
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>
