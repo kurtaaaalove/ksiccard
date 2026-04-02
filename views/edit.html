@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<<<<<<< HEAD
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>編輯我的名片 | KS-DIGI</title>
@@ -81,7 +84,11 @@
           <div class="form-group"><label>頭像圖片 URL</label><input type="text" id="e_avatar_url"></div>
 
           <button type="submit" class="btn btn-primary">💾 儲存變更</button>
+<<<<<<< HEAD
           <button type="button" class="btn btn-outline" onclick="location.href='/'">回首頁</button>
+=======
+          <button type="button" class="btn btn-outline" onclick="location.href='/ksic'">回首頁</button>
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
           <p class="error" id="editError"></p>
           <p class="success" id="editSuccess"></p>
         </form>
@@ -100,7 +107,11 @@
       errEl.style.display = 'none';
 
       try {
+<<<<<<< HEAD
         const res = await fetch('/api/card-login', {
+=======
+        const res = await fetch('/ksic/api/card-login', {
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -126,7 +137,11 @@
     });
 
     async function loadCardData(slug) {
+<<<<<<< HEAD
       const res = await fetch('/api/public/card/' + slug);
+=======
+      const res = await fetch('/ksic/api/public/card/' + slug);
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       const data = await res.json();
       // 我們需要完整資料，但 public API 只回傳 flex
       // 這邊先用 login 回傳的基本資料，使用者可以直接編輯
@@ -143,7 +158,11 @@
       eFields.forEach(f => { body[f] = document.getElementById('e_' + f)?.value || ''; });
 
       try {
+<<<<<<< HEAD
         const res = await fetch('/api/my-card', {
+=======
+        const res = await fetch('/ksic/api/my-card', {
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cardToken },
           body: JSON.stringify(body)

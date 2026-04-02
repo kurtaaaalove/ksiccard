@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<<<<<<< HEAD
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>後台管理 | KS 數位名片</title>
@@ -136,6 +139,7 @@
     .log-time { color: #bbb; font-size: 11px; }
 
     .mobile-toggle { display: none; }
+<<<<<<< HEAD
     .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 45; }
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
@@ -197,6 +201,16 @@
       /* 侧边栏 */
       .sidebar-item { padding: 16px 24px; font-size: 16px; }
       .sidebar-footer .btn-logout { padding: 14px; font-size: 15px; }
+=======
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .mobile-toggle { display: block; background: none; border: none; font-size: 22px; cursor: pointer; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .form-row { grid-template-columns: 1fr; }
+      .search-bar { flex-wrap: wrap; }
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     }
   </style>
 </head>
@@ -209,18 +223,29 @@
         <a class="sidebar-item" data-tab="users-normal" onclick="switchTab('users-normal')">&#x1F465; 普通用戶</a>
         <a class="sidebar-item" data-tab="users-vip" onclick="switchTab('users-vip')">&#x2B50; VIP 用戶</a>
         <a class="sidebar-item" data-tab="stats" onclick="switchTab('stats')">&#x1F4CA; 統計分析</a>
+<<<<<<< HEAD
         <a class="sidebar-item" href="/" style="margin-top:auto">&#x2190; 回前台</a>
+=======
+        <a class="sidebar-item" href="/ksic" style="margin-top:auto">&#x2190; 回前台</a>
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       </nav>
       <div class="sidebar-footer">
         <button class="btn-logout" onclick="logout()">登出管理後台</button>
       </div>
     </aside>
 
+<<<<<<< HEAD
     <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
     <div class="main-content">
       <div class="topbar">
         <div style="display:flex;align-items:center;gap:12px">
           <button class="mobile-toggle" onclick="toggleSidebar()">&#9776;</button>
+=======
+    <div class="main-content">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">&#9776;</button>
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
           <h1 id="pageTitle">名片管理</h1>
         </div>
         <div style="display:flex;gap:8px">
@@ -404,9 +429,15 @@
 
   <script>
     const TOKEN = localStorage.getItem('token');
+<<<<<<< HEAD
     if (!TOKEN) window.location.href = '/admin/login';
 
     const API = (path, opt = {}) => fetch('/api' + path, {
+=======
+    if (!TOKEN) window.location.href = '/ksic/admin/login';
+
+    const API = (path, opt = {}) => fetch('/ksic/api' + path, {
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       ...opt,
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN, ...opt.headers }
     }).then(r => r.json());
@@ -418,11 +449,15 @@
     const tabNames = { cards: '名片管理', 'users-normal': '普通用戶', 'users-vip': 'VIP 用戶', stats: '統計分析' };
     const tabIds = { cards: 'tabCards', 'users-normal': 'tabUsersNormal', 'users-vip': 'tabUsersVip', stats: 'tabStats' };
 
+<<<<<<< HEAD
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
     function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
 
     function switchTab(tab) {
       closeSidebar();
+=======
+    function switchTab(tab) {
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       document.querySelectorAll('.sidebar-item[data-tab]').forEach(el => el.classList.remove('active'));
       document.querySelector(`.sidebar-item[data-tab="${tab}"]`)?.classList.add('active');
       Object.values(tabIds).forEach(id => document.getElementById(id).style.display = 'none');
@@ -436,17 +471,28 @@
     // ===== Cards =====
     async function loadCards() {
       const data = await API('/cards');
+<<<<<<< HEAD
       if (data.error && data.error.includes('登入')) { window.location.href = '/admin/login'; return; }
+=======
+      if (data.error && data.error.includes('登入')) { window.location.href = '/ksic/admin/login'; return; }
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       const list = data.cards || [];
       const tbody = document.getElementById('cardList');
       const emptyMsg = document.getElementById('emptyMsg');
       if (list.length === 0) { tbody.innerHTML = ''; emptyMsg.style.display = 'block'; return; }
       emptyMsg.style.display = 'none';
+<<<<<<< HEAD
       const scrollY = window.scrollY;
       tbody.innerHTML = list.map(c => `<tr>
         <td><strong>${esc(c.name)}</strong></td>
         <td>${esc(c.company)}${c.company && c.title ? ' / ' : ''}${esc(c.title)}</td>
         <td><a class="slug-link" href="${DOMAIN}/share/${esc(c.slug)}" target="_blank">/share/${esc(c.slug)}</a></td>
+=======
+      tbody.innerHTML = list.map(c => `<tr>
+        <td><strong>${esc(c.name)}</strong></td>
+        <td>${esc(c.company)}${c.company && c.title ? ' / ' : ''}${esc(c.title)}</td>
+        <td><a class="slug-link" href="${DOMAIN}/ksic/share/${esc(c.slug)}" target="_blank">/share/${esc(c.slug)}</a></td>
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
         <td>${c.view_count}</td><td>${c.share_count}</td>
         <td><span class="badge ${c.owner_type === 'admin' ? 'badge-admin' : c.user_vip ? 'badge-vip' : 'badge-self'}">${c.owner_type === 'admin' ? '管理員' : c.user_vip ? 'VIP' : '用戶'}</span></td>
         <td><span class="badge ${c.is_active ? 'badge-on' : 'badge-off'}">${c.is_active ? '啟用' : '停用'}</span></td>
@@ -457,7 +503,10 @@
           <button class="btn-xs btn-del" onclick="deleteCard(${c.id},'${esc(c.name)}')">刪除</button>
         </div></td>
       </tr>`).join('');
+<<<<<<< HEAD
       requestAnimationFrame(() => window.scrollTo(0, scrollY));
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     }
 
     async function loadStats() {
@@ -508,7 +557,11 @@
 
       if (users.length === 0) { listEl.innerHTML = ''; emptyEl.style.display = 'block'; return; }
       emptyEl.style.display = 'none';
+<<<<<<< HEAD
       const scrollY = window.scrollY;
+=======
+
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       listEl.innerHTML = users.map(u => `
         <div class="user-card">
           <div class="user-header">
@@ -524,7 +577,10 @@
                 ${u.is_vip ? '取消 VIP' : '升級 VIP'}
               </button>
               <button class="btn-xs btn-pwd" onclick="openPwdModal(${u.id}, '${esc(u.name)} (${esc(u.email)})')">重設密碼</button>
+<<<<<<< HEAD
               <button class="btn-xs" style="background:#e74c3c;color:#fff" onclick="deleteUser(${u.id}, '${esc(u.name)}')">刪除</button>
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
             </div>
           </div>
           <div style="font-size:11px;color:#bbb;margin-bottom:8px">
@@ -533,7 +589,11 @@
           ${u.cards.length > 0 ? `<div class="user-cards-list">${u.cards.map(c => `
             <div class="user-card-item">
               <div><strong>${esc(c.name)}</strong>${c.company ? ' - ' + esc(c.company) : ''}
+<<<<<<< HEAD
                 <a href="${DOMAIN}/share/${esc(c.slug)}" target="_blank" style="margin-left:8px">/share/${esc(c.slug)}</a>
+=======
+                <a href="${DOMAIN}/ksic/share/${esc(c.slug)}" target="_blank" style="margin-left:8px">/share/${esc(c.slug)}</a>
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
               </div>
               <div class="card-stats-inline">
                 <span class="badge ${c.is_active ? 'badge-on' : 'badge-off'}" style="margin-right:6px">${c.is_active ? '啟用' : '停用'}</span>
@@ -543,6 +603,7 @@
           `).join('')}</div>` : '<div style="font-size:13px;color:#ccc;margin-top:4px">尚未建立名片</div>'}
         </div>
       `).join('');
+<<<<<<< HEAD
       requestAnimationFrame(() => window.scrollTo(0, scrollY));
     }
 
@@ -557,6 +618,8 @@
       } else {
         alert(data.error || '刪除失敗');
       }
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     }
 
     async function toggleVip(userId, name, currentVip) {
@@ -637,13 +700,22 @@
     }
 
     function copyLink(slug) {
+<<<<<<< HEAD
       navigator.clipboard.writeText(DOMAIN + '/share/' + slug).then(() => alert('已複製！'));
+=======
+      navigator.clipboard.writeText(DOMAIN + '/ksic/share/' + slug).then(() => alert('已複製！'));
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     }
 
     function logout() {
       localStorage.removeItem('token');
+<<<<<<< HEAD
       fetch('/api/auth/logout', { method: 'POST' });
       window.location.href = '/admin/login';
+=======
+      fetch('/ksic/api/auth/logout', { method: 'POST' });
+      window.location.href = '/ksic/admin/login';
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     }
 
     function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
@@ -674,7 +746,11 @@
         formData.append('file', file);
 
         try {
+<<<<<<< HEAD
           const res = await fetch('/api/upload', {
+=======
+          const res = await fetch('/ksic/api/upload', {
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + TOKEN },
             body: formData
@@ -795,10 +871,15 @@
       document.getElementById('customModalBg').classList.add('active');
     }
 
+<<<<<<< HEAD
     (async () => {
       await loadCards();
       loadStats();
     })();
+=======
+    loadCards();
+    loadStats();
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   </script>
 </body>
 </html>

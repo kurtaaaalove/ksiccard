@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<<<<<<< HEAD
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>註冊帳號 | KS 數位名片</title>
@@ -96,6 +99,7 @@
       <form id="registerForm">
         <div class="form-group">
           <label>Email <span class="req">*</span></label>
+<<<<<<< HEAD
           <div style="display:flex;gap:10px;align-items:center">
             <input type="email" id="r_email" required placeholder="your@email.com" autocomplete="email" style="flex:1">
             <button type="button" id="sendCodeBtn" onclick="sendEmailCode()" style="
@@ -110,6 +114,9 @@
           <label>Email 驗證碼 <span class="req">*</span></label>
           <input type="text" id="r_email_code" required placeholder="請輸入信箱收到的 6 位數驗證碼" maxlength="6" autocomplete="off">
           <div class="hint" style="margin-top:4px;color:rgba(255,255,255,0.35)">驗證碼 5 分鐘內有效</div>
+=======
+          <input type="email" id="r_email" required placeholder="your@email.com" autocomplete="email">
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
         </div>
         <div class="form-group">
           <label>密碼 <span class="req">*</span></label>
@@ -145,21 +152,33 @@
         <p class="msg error" id="errorMsg"></p>
       </form>
 
+<<<<<<< HEAD
       <a href="/login" class="login-link">已有帳號？<span>立即登入</span></a>
     </div>
 
     <a href="/" class="back-link">← 回首頁</a>
+=======
+      <a href="/ksic/login" class="login-link">已有帳號？<span>立即登入</span></a>
+    </div>
+
+    <a href="/ksic" class="back-link">← 回首頁</a>
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   </div>
 
   <script>
     async function loadCaptcha() {
+<<<<<<< HEAD
       const res = await fetch('/api/captcha');
+=======
+      const res = await fetch('/ksic/api/captcha');
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       const data = await res.json();
       document.getElementById('captchaId').value = data.id;
       document.getElementById('captchaImg').src = data.image;
     }
     loadCaptcha();
 
+<<<<<<< HEAD
     // 發送 Email 驗證碼
     let cooldown = 0;
     async function sendEmailCode() {
@@ -211,6 +230,8 @@
       }
     }
 
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
@@ -228,6 +249,7 @@
         return;
       }
 
+<<<<<<< HEAD
       const emailCode = document.getElementById('r_email_code').value.trim();
       if (!emailCode) {
         errEl.textContent = '請輸入 Email 驗證碼';
@@ -238,6 +260,10 @@
 
       try {
         const res = await fetch('/api/user/register', {
+=======
+      try {
+        const res = await fetch('/ksic/api/user/register', {
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -246,15 +272,23 @@
             name: document.getElementById('r_name').value,
             phone: document.getElementById('r_phone').value,
             captchaId: document.getElementById('captchaId').value,
+<<<<<<< HEAD
             captchaCode: document.getElementById('r_captcha').value,
             emailCode
+=======
+            captchaCode: document.getElementById('r_captcha').value
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
           })
         });
         const data = await res.json();
         if (data.ok) {
           localStorage.setItem('userToken', data.token);
           localStorage.setItem('userName', data.user.name);
+<<<<<<< HEAD
           window.location.href = '/dashboard';
+=======
+          window.location.href = '/ksic/dashboard';
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
         } else {
           errEl.textContent = data.error;
           errEl.style.display = 'block';

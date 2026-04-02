@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<<<<<<< HEAD
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>我的名片 | KS 數位名片</title>
@@ -138,6 +141,7 @@
     .form-group input:disabled { background: #f5f5f5; color: #bbb; cursor: not-allowed; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .form-divider { border: none; border-top: 1px solid #f0f0f0; margin: 20px 0; }
+<<<<<<< HEAD
     .color-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
     .color-opt {
       width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 3px solid transparent;
@@ -154,6 +158,8 @@
       background: #f8f8f8; color: #888; cursor: pointer; white-space: nowrap;
     }
     .btn-reset-color:hover { background: #eee; }
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     .form-section-title { font-size: 13px; color: #999; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
     .form-actions { display: flex; gap: 10px; margin-top: 24px; }
     .form-actions .btn-sm { flex: 1; padding: 14px; font-size: 15px; border-radius: 10px; }
@@ -162,6 +168,7 @@
     @media (max-width: 600px) {
       .card-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
+<<<<<<< HEAD
       .navbar { padding: 0 12px; height: auto; min-height: 56px; flex-wrap: wrap; gap: 8px; padding-top: 10px; padding-bottom: 10px; }
       .navbar-right { gap: 8px; }
       .btn-sm { padding: 10px 14px; font-size: 14px; min-height: 40px; }
@@ -176,13 +183,23 @@
       .form-group input, .form-group select { font-size: 16px; padding: 12px 14px; }
       .form-actions .btn-sm { padding: 16px; font-size: 16px; min-height: 48px; }
       .color-opt { width: 36px; height: 36px; }
+=======
+      .navbar { padding: 0 16px; }
+      .main { padding: 20px 16px 60px; }
+      .welcome { flex-direction: column; gap: 12px; }
+      .vip-banner { flex-direction: column; gap: 12px; text-align: center; }
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     }
   </style>
 </head>
 <body>
 
   <nav class="navbar">
+<<<<<<< HEAD
     <a href="/" class="navbar-brand">KS<span>.</span>數位名片</a>
+=======
+    <a href="/ksic" class="navbar-brand">KS<span>.</span>數位名片</a>
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     <div class="navbar-right">
       <span class="navbar-user" id="userNameDisplay"></span>
       <span class="vip-badge-nav" id="vipBadgeNav" style="display:none">VIP</span>
@@ -243,7 +260,11 @@
       <div class="form-group">
         <label>專屬連結名稱</label>
         <input type="text" id="f_slug" placeholder="例如: xiaoming（留空自動產生）">
+<<<<<<< HEAD
         <div style="font-size:11px;color:#aaa;margin-top:3px">分享連結將是 card.ks-digi.com/share/你的名稱</div>
+=======
+        <div style="font-size:11px;color:#aaa;margin-top:3px">分享連結將是 card.ks-digi.com/ksic/share/你的名稱</div>
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       </div>
       <div class="form-row">
         <div class="form-group"><label>公司</label><input type="text" id="f_company" placeholder="公司名稱"></div>
@@ -251,6 +272,7 @@
       </div>
       <div class="form-row">
         <div class="form-group"><label>部門</label><input type="text" id="f_department"></div>
+<<<<<<< HEAD
         <div class="form-group">
           <label>名片主色調</label>
           <div class="color-picker" id="colorPicker">
@@ -288,6 +310,9 @@
           <div class="form-group"><label>底部背景色</label><div style="display:flex;align-items:center;gap:8px"><input type="color" id="cc_footerBg" value="#ffffff" style="width:40px;height:32px;border:none;cursor:pointer;border-radius:6px"><span id="cc_footerBg_val" style="font-size:12px;color:#aaa">#ffffff</span><button type="button" class="btn-reset-color" onclick="resetCC('footerBg','')">不設定</button></div></div>
         </div>
       </div>
+=======
+        <div class="form-group"><label>主題色</label><input type="color" id="f_theme_color" value="#06c755"></div>
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       </div>
 
       <hr class="form-divider">
@@ -313,6 +338,7 @@
         </div>
       </div>
 
+<<<<<<< HEAD
       <!-- VIP 分享開關 -->
       <div id="shareToggleSection" style="display:none">
         <hr class="form-divider">
@@ -324,6 +350,8 @@
         <div style="font-size:11px;color:#aaa;margin-top:2px">開啟後，訪客在名片頁面可透過 LINE 將此名片分享給好友</div>
       </div>
 
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       <hr class="form-divider">
       <div class="form-section-title">頭像</div>
       <div class="form-group">
@@ -342,14 +370,22 @@
 
   <script>
     const TOKEN = localStorage.getItem('userToken');
+<<<<<<< HEAD
     if (!TOKEN) window.location.href = '/login';
+=======
+    if (!TOKEN) window.location.href = '/ksic/login';
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
 
     const userName = localStorage.getItem('userName') || '';
     document.getElementById('userNameDisplay').textContent = userName;
     document.getElementById('welcomeText').textContent = `${userName}，歡迎回來！`;
 
     const DOMAIN = location.origin;
+<<<<<<< HEAD
     const API = (path, opt = {}) => fetch('/api' + path, {
+=======
+    const API = (path, opt = {}) => fetch('/ksic/api' + path, {
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       ...opt,
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN, ...opt.headers }
     }).then(r => r.json());
@@ -366,7 +402,11 @@
       const data = await API('/user/me');
       if (!data.ok) {
         localStorage.removeItem('userToken');
+<<<<<<< HEAD
         window.location.href = '/login';
+=======
+        window.location.href = '/ksic/login';
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
         return;
       }
       isVip = !!data.user.is_vip;
@@ -401,6 +441,7 @@
       document.getElementById('createBtn').style.display = currentCardCount >= cardLimit ? 'none' : '';
     }
 
+<<<<<<< HEAD
     // 顏色選擇器
     function selectColor(color) {
       document.getElementById('f_theme_color').value = color;
@@ -454,6 +495,8 @@
       });
     }
 
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     function updateVipFields() {
       vipFields.forEach(f => {
         const el = document.getElementById('f_' + f);
@@ -462,15 +505,22 @@
           if (!isVip) el.placeholder = 'VIP 專屬功能';
         }
       });
+<<<<<<< HEAD
       document.getElementById('shareToggleSection').style.display = isVip ? '' : 'none';
       document.getElementById('vipColorSection').style.display = isVip ? '' : 'none';
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     }
 
     async function loadCards() {
       const data = await API('/user/cards');
       if (data.error) {
         localStorage.removeItem('userToken');
+<<<<<<< HEAD
         window.location.href = '/login';
+=======
+        window.location.href = '/ksic/login';
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
         return;
       }
 
@@ -497,8 +547,13 @@
             <span>&#x1F441; ${c.view_count} 次瀏覽</span>
             <span>&#x1F4E4; ${c.share_count} 次分享</span>
           </div>
+<<<<<<< HEAD
           <a class="card-item-link" href="${DOMAIN}/share/${esc(c.slug)}" target="_blank">
             /share/${esc(c.slug)}
+=======
+          <a class="card-item-link" href="${DOMAIN}/ksic/share/${esc(c.slug)}" target="_blank">
+            /ksic/share/${esc(c.slug)}
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
           </a>
           <div class="card-item-actions">
             <button class="btn-action btn-copy" onclick="copyLink('${esc(c.slug)}')">複製連結</button>
@@ -517,6 +572,7 @@
       document.getElementById('editId').value = id || '';
       document.getElementById('modalTitle').textContent = id ? '編輯名片' : '建立名片';
       document.getElementById('avatarPreview').innerHTML = '';
+<<<<<<< HEAD
       if (!id) {
         fields.forEach(f => {
           const el = document.getElementById('f_' + f);
@@ -526,6 +582,12 @@
         selectColor('#06c755');
         setColorConfig('');
       }
+=======
+      if (!id) fields.forEach(f => {
+        const el = document.getElementById('f_' + f);
+        if (el) el.value = f === 'theme_color' ? '#06c755' : '';
+      });
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       updateVipFields();
       document.getElementById('modalBg').classList.add('active');
     }
@@ -541,9 +603,12 @@
         const el = document.getElementById('f_' + f);
         if (el && c[f] != null) el.value = c[f];
       });
+<<<<<<< HEAD
       document.getElementById('f_allow_share').checked = !!c.allow_share;
       selectColor(c.theme_color || '#06c755');
       setColorConfig(c.color_config);
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       if (c.avatar_url) {
         document.getElementById('avatarPreview').innerHTML =
           `<img src="${esc(c.avatar_url)}" style="width:60px;height:60px;border-radius:50%;object-fit:cover">`;
@@ -554,8 +619,11 @@
       const id = document.getElementById('editId').value;
       const body = {};
       fields.forEach(f => { body[f] = document.getElementById('f_' + f)?.value || ''; });
+<<<<<<< HEAD
       body.allow_share = document.getElementById('f_allow_share').checked ? 1 : 0;
       body.color_config = getColorConfig();
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       if (!body.name) return alert('姓名為必填');
 
       const url = id ? '/user/cards/' + id : '/user/cards';
@@ -566,11 +634,15 @@
         closeModal();
         loadCards();
         loadUserInfo();
+<<<<<<< HEAD
         if (id) {
           alert('儲存成功！');
         } else if (data.share_url) {
           alert('名片建立成功！\n分享連結: ' + data.share_url);
         }
+=======
+        if (!id && data.share_url) alert('名片建立成功！\n分享連結: ' + data.share_url);
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       } else {
         alert(data.error || '儲存失敗');
       }
@@ -589,7 +661,11 @@
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
       try {
+<<<<<<< HEAD
         const res = await fetch('/api/user/upload', {
+=======
+        const res = await fetch('/ksic/api/user/upload', {
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
           method: 'POST', headers: { 'Authorization': 'Bearer ' + TOKEN }, body: formData
         });
         const data = await res.json();
@@ -602,14 +678,22 @@
     }
 
     function copyLink(slug) {
+<<<<<<< HEAD
       navigator.clipboard.writeText(DOMAIN + '/share/' + slug).then(() => alert('已複製！'));
+=======
+      navigator.clipboard.writeText(DOMAIN + '/ksic/share/' + slug).then(() => alert('已複製！'));
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     }
 
     function logout() {
       localStorage.removeItem('userToken');
       localStorage.removeItem('userName');
       localStorage.removeItem('isVip');
+<<<<<<< HEAD
       window.location.href = '/';
+=======
+      window.location.href = '/ksic';
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
     }
 
     function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }

@@ -108,8 +108,11 @@ function initDatabase() {
     'ALTER TABLE cards ADD COLUMN user_id INTEGER DEFAULT NULL REFERENCES users(id) ON DELETE SET NULL',
     'ALTER TABLE users ADD COLUMN is_vip INTEGER NOT NULL DEFAULT 0',
     'ALTER TABLE users ADD COLUMN vip_at DATETIME DEFAULT NULL',
+<<<<<<< HEAD
     'ALTER TABLE cards ADD COLUMN allow_share INTEGER NOT NULL DEFAULT 0',
     'ALTER TABLE cards ADD COLUMN color_config TEXT DEFAULT ""',
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   ];
   for (const sql of alterColumns) {
     try { db.exec(sql); } catch (e) { /* 欄位已存在 */ }

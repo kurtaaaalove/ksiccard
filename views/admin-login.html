@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<<<<<<< HEAD
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>管理員登入 | KS 數位名片</title>
@@ -81,7 +84,11 @@
       </form>
     </div>
 
+<<<<<<< HEAD
     <a href="/" class="back">← 回首頁</a>
+=======
+    <a href="/ksic" class="back">← 回首頁</a>
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   </div>
 
   <script>
@@ -93,7 +100,11 @@
       errEl.style.display = 'none';
 
       try {
+<<<<<<< HEAD
         const res = await fetch('/api/auth/login', {
+=======
+        const res = await fetch('/ksic/api/auth/login', {
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -104,7 +115,11 @@
         const data = await res.json();
         if (data.ok) {
           localStorage.setItem('token', data.token);
+<<<<<<< HEAD
           window.location.href = '/admin';
+=======
+          window.location.href = '/ksic/admin';
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
         } else {
           errEl.textContent = data.error;
           errEl.style.display = 'block';

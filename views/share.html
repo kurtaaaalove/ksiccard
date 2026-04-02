@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+<<<<<<< HEAD
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-32x32.png" sizes="32x32">
   <link rel="icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-192x192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="https://ks-digi.com/wp-content/uploads/2022/04/cropped-KS-SITE-180x180.png">
+=======
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>分享名片 | KS-DIGI</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+<<<<<<< HEAD
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
@@ -75,12 +79,48 @@
       </button>
       <button class="btn btn-copy" id="copyBtn" style="display:none" onclick="copyLink()">
         複製分享連結
+=======
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+           background: #f5f5f5; color: #333; min-height: 100vh;
+           display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    .container { max-width: 380px; width: 100%; }
+    .card { background: #fff; border-radius: 16px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .avatar { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 14px;
+              background: #e8e8e8; display: flex; align-items: center; justify-content: center;
+              font-size: 32px; overflow: hidden; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    h1 { font-size: 22px; margin-bottom: 4px; }
+    .meta { color: #888; font-size: 14px; margin-bottom: 24px; }
+    .btn { display: block; width: 100%; padding: 16px; font-size: 16px; font-weight: 600;
+           border: none; border-radius: 12px; cursor: pointer; margin-bottom: 10px; }
+    .btn-line { background: #06c755; color: #fff; box-shadow: 0 4px 14px rgba(6,199,85,0.3); }
+    .btn-copy { background: #f0f0f0; color: #333; }
+    .status { margin-top: 16px; font-size: 13px; color: #888; }
+    .error { color: #e74c3c; }
+    .loading { animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="avatar" id="avatarArea">📇</div>
+      <h1 id="cardName" class="loading">載入中...</h1>
+      <p class="meta" id="cardMeta"></p>
+
+      <button class="btn btn-line" id="shareBtn" style="display:none" onclick="shareFlex()">
+        📤 透過 LINE 分享此名片
+      </button>
+      <button class="btn btn-copy" id="copyBtn" style="display:none" onclick="copyLink()">
+        📋 複製分享連結
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       </button>
 
       <p class="status" id="statusMsg"></p>
     </div>
   </div>
 
+<<<<<<< HEAD
   <div class="footer">
     <a href="/">Powered by KS-DIGI</a>
   </div>
@@ -109,6 +149,59 @@
         document.getElementById('copyBtn').style.display = 'block';
       } catch (e) {
         showError('載入失敗，請稍後再試');
+=======
+  <script>
+    // 從 URL 取得 slug: /share/kurt → kurt
+    const slug = location.pathname.split('/ksic/share/')[1];
+    let cardData = null;
+    const LIFF_ID = '2007344981-yXozKWX0';
+
+    async function init() {
+      if (!slug) {
+        showError('無效的名片連結');
+        return;
+      }
+
+      // 1) 載入名片資料
+      try {
+        const res = await fetch('/ksic/api/public/card/' + slug);
+        const data = await res.json();
+        if (!data.ok) { showError('名片不存在或已停用'); return; }
+        cardData = data;
+
+        document.getElementById('cardName').textContent = data.name;
+        document.getElementById('cardName').classList.remove('loading');
+        document.getElementById('copyBtn').style.display = 'block';
+      } catch (e) {
+        showError('載入失敗，請稍後再試');
+        return;
+      }
+
+      // 2) 初始化 LIFF
+      try {
+        await liff.init({ liffId: LIFF_ID });
+        if (liff.isInClient()) {
+          // 在 LINE 內：未登入就登入，已登入就顯示分享按鈕
+          if (!liff.isLoggedIn()) {
+            liff.login({ redirectUri: window.location.href });
+            return;
+          }
+          document.getElementById('shareBtn').style.display = 'block';
+        } else {
+          // 在瀏覽器中：顯示跳轉連結，正式環境才自動跳轉
+          const liffUrl = `https://liff.line.me/${LIFF_ID}/ksic/share/${slug}`;
+          document.getElementById('statusMsg').innerHTML =
+            `<a href="${liffUrl}" style="color:#06c755;text-decoration:underline;font-size:15px">👉 點此在 LINE 中開啟並分享</a>`;
+          const isProduction = location.hostname !== 'localhost' && !location.hostname.startsWith('127.');
+          if (isProduction) {
+            setTimeout(() => { window.location.href = liffUrl; }, 1500);
+          }
+        }
+      } catch (e) {
+        const liffUrl = `https://liff.line.me/${LIFF_ID}/ksic/share/${slug}`;
+        document.getElementById('statusMsg').innerHTML =
+          `<a href="${liffUrl}" style="color:#06c755;text-decoration:underline;font-size:15px">👉 點此在 LINE 中開啟並分享</a>`;
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       }
     }
 
@@ -117,12 +210,17 @@
       const btn = document.getElementById('shareBtn');
       btn.disabled = true;
       btn.textContent = '分享中...';
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       try {
         await liff.shareTargetPicker([{
           type: 'flex',
           altText: cardData.altText || cardData.name + ' 的名片',
           contents: cardData.flex
         }]);
+<<<<<<< HEAD
         fetch('/api/public/card/' + slug + '/shared', { method: 'POST' }).catch(() => {});
         btn.textContent = '已分享！';
       } catch (e) {
@@ -138,15 +236,48 @@
         const btn = document.getElementById('copyBtn');
         btn.textContent = '已複製！';
         setTimeout(() => { btn.textContent = '複製分享連結'; }, 2000);
+=======
+
+        // 記錄分享
+        fetch('/ksic/api/public/card/' + slug + '/shared', { method: 'POST' }).catch(() => {});
+        btn.textContent = '✅ 已分享！';
+        setTimeout(() => {
+          btn.textContent = '📤 透過 LINE 分享此名片';
+          btn.disabled = false;
+        }, 2000);
+      } catch (e) {
+        btn.textContent = '📤 透過 LINE 分享此名片';
+        btn.disabled = false;
+        if (e.message && e.message.includes('cancel')) {
+          // 使用者取消，不顯示錯誤
+        } else {
+          document.getElementById('statusMsg').textContent = '分享失敗: ' + e.message;
+        }
+      }
+    }
+
+    function copyLink() {
+      const url = window.location.href;
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✅ 已複製！';
+        setTimeout(() => { btn.textContent = '📋 複製分享連結'; }, 2000);
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       });
     }
 
     function showError(msg) {
+<<<<<<< HEAD
       document.getElementById('cardName').textContent = '';
+=======
+      document.getElementById('cardName').textContent = '😢';
+      document.getElementById('cardName').classList.remove('loading');
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
       document.getElementById('statusMsg').textContent = msg;
       document.getElementById('statusMsg').classList.add('error');
     }
 
+<<<<<<< HEAD
     function isMobile() {
       return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
@@ -195,6 +326,9 @@
     }
 
     initializeLiff();
+=======
+    init();
+>>>>>>> 2dc27ee2c4d727f45fa8c47070dbf948720a22af
   </script>
 </body>
 </html>
